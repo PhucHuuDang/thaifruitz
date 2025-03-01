@@ -19,17 +19,12 @@ const handleParams = (params: Record<string, any>, endpoint: string) => {
 
 const fetching = async (endpoint: string, params?: Record<string, any>) => {
   try {
-    // const url = new URL(`${BASE_URL}${endpoint}`);
-    // if (params) {
-    //   Object.keys(params).forEach((key) =>
-    //     url.searchParams.append(key, params[key])
-    //   );
-    // }
+   
 
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_URL_API}${endpoint}`
     );
-    console.log(response)
+    // console.log(response)
     const data = await response.json();
     return data;
   } catch (error) {
