@@ -112,8 +112,8 @@ export const FistStep = memo(
   }: FirstStepProps) => {
     // const { combos, customCombo } = useData();
 
-    console.log("data sau khi duoc lay ve", selectProductInCombo);
-    console.log("san pham don le", selectedItemsDetails);
+    // console.log("data sau khi duoc lay ve", selectProductInCombo);
+    // console.log("san pham don le", selectedItemsDetails);
 
     const toggleProInductInCombo = (itemId: string, comboId: string) => {
       const isSelected = selectProductInCombo?.some(

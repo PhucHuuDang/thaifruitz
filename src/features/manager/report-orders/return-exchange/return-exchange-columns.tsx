@@ -26,7 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-import { vietnameseDate } from "@/utils/date";
+import { formatRelativeTime, vietnameseDate } from "@/utils/date";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getUserInitials, placeholderImage } from "@/utils/label";
 import { LinkPreview } from "@/components/global-components/link-preview";
@@ -254,71 +254,6 @@ export const returnExchangeColumns: ColumnDef<ReturnExchangeOrders>[] = [
   },
 
   {
-    id: "Lý do từ chối",
-    accessorKey: "reasonReject",
-    header: ({}) => {
-      return (
-        <div className="flex items-center gap-2 font-semibold">
-          <CircleXIcon className="size-6" />
-          Lý do từ chối
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      const reason = row.original?.reasonReject as string | null;
-
-      return reason ? (
-        <div
-          className=" text-violet-500 font-semibold line-clamp-3 underline"
-          title={reason}
-        >
-          {reason}
-        </div>
-      ) : null;
-    },
-    meta: {
-      align: "center",
-      export: {
-        pdf: { header: "Lý do từ chối" },
-        csv: { header: "Lý do từ chối" },
-      },
-    },
-  },
-
-  {
-    id: "linkDocument",
-    accessorKey: "linkDocument",
-    header: ({ column }) => {
-      return (
-        <div>
-          <div className="flex items-center gap-2 font-semibold">
-            <LinkIcon className="size-6" />
-            Tài liệu chứng minh
-          </div>
-        </div>
-      );
-    },
-    cell: ({ row }) => {
-      const linkDocument = row.original.linkDocument as string;
-
-      return linkDocument ? (
-        <LinkPreview
-          url={linkDocument}
-          target="_blank"
-          className="text-sky-600 hover:text-sky-700 hover:underline flex items-center gap-1 text-sm font-medium group"
-        >
-          <ExternalLink className="size-5" />
-          Xem tài liệu
-          <ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-        </LinkPreview>
-      ) : null;
-    },
-    meta: {
-      align: "center",
-      export: { pdf: { header: "Tài liệu chứng minh" } },
-    },
-  },
-  {
     id: "Ngày yêu cầu",
     accessorKey: "requestDate",
     header: ({ column }) => {
@@ -335,9 +270,15 @@ export const returnExchangeColumns: ColumnDef<ReturnExchangeOrders>[] = [
       const requestDate = row.original.requestDate as string;
 
       return (
-        <div className="flex items-center gap-2 text-slate-700 font-semibold">
-          <Calendar className="size-6" />
-          {vietnameseDate(requestDate, true)}
+        <div className="flex flex-col items-start gap-2">
+          <div className="flex items-center gap-2 text-slate-700 font-semibold">
+            <Calendar className="size-6" />
+            {vietnameseDate(requestDate, true)}
+          </div>
+
+          <span className="text-sm text-sky-500 font-semibold underline">
+            {formatRelativeTime(requestDate)}
+          </span>
         </div>
       );
     },
@@ -366,7 +307,15 @@ export const returnExchangeColumns: ColumnDef<ReturnExchangeOrders>[] = [
         <div className="flex items-center gap-2 text-slate-700 font-semibold">
           <Calendar className="size-6" />
           {processedDate ? (
-            vietnameseDate(processedDate, true)
+            <div className="flex flex-col items-start gap-2">
+              <div className="flex items-center gap-2 text-slate-700 font-semibold">
+                {vietnameseDate(processedDate, true)}
+              </div>
+
+              <span className="text-sm text-sky-500 font-semibold underline">
+                {formatRelativeTime(processedDate)}
+              </span>
+            </div>
           ) : (
             <span className="text-slate-700 font-semibold">
               Chưa được xử lý
@@ -432,6 +381,76 @@ export const returnExchangeColumns: ColumnDef<ReturnExchangeOrders>[] = [
     meta: {
       align: "center",
       export: { pdf: { header: "Người xử lý" } },
+    },
+  },
+
+  {
+    id: "Lý do từ chối",
+    accessorKey: "reasonReject",
+    header: ({}) => {
+      return (
+        <div className="flex items-center gap-2 font-semibold">
+          <CircleXIcon className="size-6" />
+          Lý do từ chối
+        </div>
+      );
+    },
+    cell: ({ row }) => {
+      const reason = row.original?.reasonReject as string | null;
+
+      return reason ? (
+        <div
+          className=" text-violet-500 font-semibold line-clamp-3 underline"
+          title={reason}
+        >
+          {reason}
+        </div>
+      ) : (
+        <span className="text-slate-500 font-semibold text-base">---</span>
+      );
+    },
+    meta: {
+      align: "center",
+      export: {
+        pdf: { header: "Lý do từ chối" },
+        csv: { header: "Lý do từ chối" },
+      },
+    },
+  },
+
+  {
+    id: "linkDocument",
+    accessorKey: "linkDocument",
+    header: ({ column }) => {
+      return (
+        <div>
+          <div className="flex items-center gap-2 font-semibold">
+            <LinkIcon className="size-6" />
+            Tài liệu chứng minh
+          </div>
+        </div>
+      );
+    },
+    cell: ({ row }) => {
+      const linkDocument = row.original.linkDocument as string;
+
+      return linkDocument ? (
+        <LinkPreview
+          url={linkDocument}
+          target="_blank"
+          className="text-sky-600 hover:text-sky-700 hover:underline flex items-center gap-1 text-sm font-medium group"
+        >
+          <ExternalLink className="size-5" />
+          Xem tài liệu
+          <ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </LinkPreview>
+      ) : (
+        <span className="text-slate-500 font-semibold text-base">---</span>
+      );
+    },
+    meta: {
+      align: "center",
+      export: { pdf: { header: "Tài liệu chứng minh" } },
     },
   },
 

@@ -335,6 +335,8 @@ export const ReportOrdersListClient = ({
           }}
           title="Danh sách đơn hàng yêu cầu đổi trả"
           description="Danh sách đơn hàng yêu cầu đổi trả của khách hàng"
+          enableSelection={false}
+          enableExpansion={false}
         />
       ) : (
         <EnhanceDataTableWithAllFeatures
@@ -348,6 +350,8 @@ export const ReportOrdersListClient = ({
             isFetching: orderList.isFetching,
             isLoading: orderList.isLoading,
           }}
+          enableSelection={false}
+          enableExpansion={false}
         />
       )}
 

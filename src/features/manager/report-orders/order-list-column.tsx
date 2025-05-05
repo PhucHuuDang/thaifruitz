@@ -473,7 +473,8 @@ export const orderListColumns: ColumnDef<OrderData>[] = [
       const conditionalUpdate =
         status !== "received" &&
         status !== "cancelled" &&
-        status !== "returned";
+        status !== "returned" &&
+        status !== "completed";
 
       return (
         <div className="flex items-center justify-end gap-2">

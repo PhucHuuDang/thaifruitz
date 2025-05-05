@@ -20,7 +20,10 @@ import { OrderItem as OrderItemTypes } from "@/features/client/payment/successfu
 import { OrderItem } from "@/app/(client)/payment/success/[[...slug]]/order-confirmation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { returnExchangeLabel } from "@/features/manager/report-orders/return-exchange/return-exchange-status/status";
+import {
+  justReturnExchangeLabel,
+  returnExchangeLabel,
+} from "@/features/manager/report-orders/return-exchange/return-exchange-status/status";
 
 interface RequestHistoryContentProps {
   request: ReturnExchangeRequest;
@@ -50,10 +53,11 @@ export const RequestHistoryContent = memo(
             <div>
               <CardTitle className="text-lg flex items-center gap-2">
                 <RefreshCw className="h-5 w-5" />
-                Yêu cầu {request.requestType} #{request.orderId}
+                Yêu cầu {justReturnExchangeLabel(request.requestType)} #
+                {request.orderId}
               </CardTitle>
               <CardDescription className="mt-1 flex flex-col items-start gap-y-3">
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-1 text-slate-700">
                   <Clock className="h-4 w-4" />
                   Ngày yêu cầu: {vietnameseDate(request.requestDate, true)}
                 </span>

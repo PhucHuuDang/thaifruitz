@@ -90,12 +90,13 @@ export default function ReturnItemCard({ item }: ReturnItemCardProps) {
                 </span>
 
                 {productDetail?.discountPercentage &&
-                  productDetail?.discountPercentage > 0 &&
-                  productDetail?.unitPrice > 0 && (
-                    <span className="text-sm text-rose-500 font-semibold line-through">
-                      {formatVND(productDetail?.unitPrice)}
-                    </span>
-                  )}
+                productDetail?.discountPercentage > 0
+                  ? productDetail?.unitPrice > 0 && (
+                      <span className="text-sm text-rose-500 font-semibold line-through">
+                        {formatVND(productDetail?.unitPrice)}
+                      </span>
+                    )
+                  : null}
               </div>
             </div>
 

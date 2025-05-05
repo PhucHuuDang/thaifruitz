@@ -47,6 +47,7 @@ import { FistStep } from "./steps-return/first-step";
 import { SecondStep } from "./steps-return/second-step";
 import { useData } from "@/providers/data-provider";
 import { OrderItemDetailsTypes } from "../order-detail-components/order-detail.types";
+import { useQueryClient } from "@tanstack/react-query";
 
 const returnReasons = [
   {
@@ -169,6 +170,8 @@ export function ReturnOrderDialog({ orderId }: ReturnOrderDialogProps) {
     (item) => item.images
   );
 
+  const queryClient = useQueryClient();
+
   // console.log("hinh trong combo", imagesProductInCombo);
 
   const handleConfirm = async () => {
@@ -222,14 +225,37 @@ export function ReturnOrderDialog({ orderId }: ReturnOrderDialogProps) {
       return;
     }
 
+    const validImages = selectProductInCombo.flatMap((item) =>
+      item.images?.[0] ? [item.images[0]] : []
+    );
+
     const allImages: File[] = [
       ...selectedItems.map(
         (itemId) => selectedItemsDetails[itemId].images?.[0]
       ),
-      ...selectProductInCombo.map((item) => item.images?.[0]),
+      ...validImages,
+      // ...selectProductInCombo.map((item) => item.images?.[0]),
     ].filter((img): img is File => Boolean(img));
 
     setIsSubmitting(true);
+
+    console.log("tat ca anh", allImages);
+    // console.log(
+    //   "anh don le",
+    //   selectedItems.map((itemId) => selectedItemsDetails[itemId].images?.[0])
+    // );
+
+    // console.log(
+    //   "anh trong combo",
+    //   selectProductInCombo.map((item) => item.images?.[0])
+    // );
+
+    // console.log(
+    //   "anh trong combo khac null",
+    //   selectProductInCombo.map((item) => item.images?.[0])
+    // );
+
+    // console.log("anh ton tại", validImages);
 
     try {
       const formData = new FormData();
@@ -270,6 +296,23 @@ export function ReturnOrderDialog({ orderId }: ReturnOrderDialogProps) {
 
       if (response.status === 200) {
         toast.success("Yêu cầu trả hàng đã được gửi thành công.");
+
+        queryClient.invalidateQueries({
+          queryKey: ["OrderDetail", orderId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["Customer", "Orders"],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [ORDERS_KEY.ORDERS_LIST],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [ORDERS_KEY.ORDER_LIST_DETAIL, orderId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [ORDERS_KEY.RETURN_EXCHANGE],
+        });
+
         setOpen(false);
       }
     } catch (error) {

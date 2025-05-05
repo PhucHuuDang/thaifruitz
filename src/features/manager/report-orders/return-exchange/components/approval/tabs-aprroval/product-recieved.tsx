@@ -53,7 +53,7 @@ export const ProductReceived = memo(
     const entichReturnRequestData = returnRequestData.map((data) => {});
 
     return (
-      <ScrollArea className="max-h-[60vh] sm:max-h-[70vh] lg:max-h-[80vh] overflow-y-auto space-y-4 motion-preset-slide-right motion-duration-300 pb-16">
+      <ScrollArea className="max-h-[60vh] h-full sm:h-[70vh] lg:h-[85vh]  space-y-4 motion-preset-slide-right motion-duration-300 p-4 pb-16">
         {itemsData.map((item, index) => {
           const originalItem = returnRequestData.find(
             (original) =>
