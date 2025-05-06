@@ -5,7 +5,6 @@ import { ApiResponse } from "@/types/types";
 import Link from "next/link";
 import React from "react";
 import Image from "next/image";
-import CustomSlide from "@/components/global-components/slide/custom-slide";
 import { CarouselItem } from "@/components/ui/carousel";
 import { CarouselCustomized } from "@/components/custom/carousel-customized";
 
@@ -33,35 +32,60 @@ const Promotion = () => {
   }
 
   return promotions?.value?.length ? (
-    <CarouselCustomized title="Sự kiện giảm giá" delay={3200}>
+    <CarouselCustomized title="Sự kiện giảm giá" delay={4000}>
       {promotions?.value?.map((promotion: any) => {
         return (
           <CarouselItem className="hover:cursor-pointer" key={promotion?.id}>
+            {/* <PromotionItem promotion={promotion} /> */}
             <div
               key={promotion.id}
-              className="relative rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
+              className="relative rounded-3xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
             >
               <Image
-                className="object-cover w-full h-72 rounded-t-lg"
-                src={"/images/single.jpg"}
+                className="object-cover w-full h-72 rounded-t-xl"
+                // src={"/images/single.jpg"}
+                src={promotion.image || "/images/single.jpg"}
                 alt={promotion.name}
                 height={1000}
                 width={1000}
               />
               <div className="absolute inset-0 flex items-center justify-center p-6">
-                <div className="text-center bg-black/50 backdrop-blur-sm p-6 rounded-xl w-full max-w-md mx-4">
-                  <h3 className="text-3xl font-bold text-white mb-2">
-                    {promotion.name}
-                  </h3>
-                  <span className="text-gray-100 text-sm mb-4">
-                    {promotion.description}
-                  </span>
+                <div className="text-center bg-gradient-to-r from-slate-500 to-slate-800 backdrop-blur-sm p-6 rounded-3xl w-full max-w-md mx-4">
+                  <div className="flex flex-col items-center justify-center mb-4">
+                    <h3 className="text-3xl font-bold italic text-white mb-2">
+                      {promotion.name}
+                    </h3>
+                    <span className="text-white text-sm mb-4">
+                      {promotion.description}
+                    </span>
+
+                    {promotion.maxAmount ? (
+                      <span className="text-sm text-white mb-3 line-clamp-2">
+                        Giảm tối đa{" "}
+                        <span className="text-base font-semibold text-sky-500">
+                          {promotion.maxAmount}
+                        </span>
+                      </span>
+                    ) : null}
+
+                    {promotion.percentage ? (
+                      <span className="text-sm text-white mb-3 line-clamp-2">
+                        Giảm giá{" "}
+                        <span className="text-base font-semibold text-sky-500">
+                          {promotion.percentage}%
+                        </span>
+                      </span>
+                    ) : null}
+                  </div>
                   <Link href={`/promotion/${promotion.id}`}>
                     <Button
                       className="bg-white text-black hover:bg-gray-100 px-6 py-2 rounded-full font-medium transition-colors duration-200"
                       variant={"outline"}
+                      disabled={promotion.isExpired}
                     >
-                      Khám phá ngay
+                      {!promotion.isExpired
+                        ? "Khám phá ngay"
+                        : "Khuyến mãi kết thúc"}
                     </Button>
                   </Link>
                 </div>

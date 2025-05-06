@@ -61,12 +61,12 @@ export const CartSummary = memo(
               {formatVND(subtotal + customComboPrice)}
             </span>
           </div>
-          {discount && (
+          {discount ? (
             <div className="flex justify-between text-sm">
               <span className="text-slate-700 font-semibold">Giảm giá</span>
               <span className="text-destructive">-{formatVND(discount)}</span>
             </div>
-          )}
+          ) : null}
           <div className="flex justify-between text-slate-700 font-semibold">
             <span>Tổng tiền</span>
             <AdvancedColorfulBadges

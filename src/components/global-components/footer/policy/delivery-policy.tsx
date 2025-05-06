@@ -56,15 +56,14 @@ export function DeliveryPolicy() {
               <AccordionContent>
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                  ThaiFruiz sử dụng dịch vụ chuyển phát nhanh của Viettel Post
-                    cho các đơn hàng ngoại tỉnh (ngoài khu vực TP. Hồ Chí Minh).
-                    Tốc độ giao hàng sẽ phụ thuộc vào tùy chọn của khách hàng
-                    qua Viettel Post.
+                    ThaiFruiz sử dụng dịch vụ chuyển phát nhanh của Viettel
+                    Post, GNH cho các đơn hàng ngoại tỉnh (ngoài khu vực TP. Hồ
+                    Chí Minh). Tốc độ giao hàng sẽ phụ thuộc vào tùy chọn của
+                    khách hàng qua Viettel Post.
                   </p>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     Đối với đơn hàng trong nội thành TP. Hồ Chí Minh, ThaiFruiz
-                    có đội ngũ nhân viên giao hàng tận nơi, đảm bảo sản phẩm đến
-                    tay khách hàng nhanh chóng và an toàn.
+                    đảm bảo sản phẩm đến tay khách hàng nhanh chóng và an toàn.
                   </p>
                   <div className="bg-muted p-4 rounded-lg">
                     <h4 className="font-semibold mb-2 flex items-center gap-2">
@@ -72,8 +71,8 @@ export function DeliveryPolicy() {
                       <span>Vận chuyển miễn phí</span>
                     </h4>
                     <p className="text-sm">
-                      ThaiFruiz áp dụng chính sách vận chuyển miễn phí cho các
-                      đơn hàng giao trong khu vực TP. Hồ Chí Minh, tạo điều kiện
+                      ThaiFruiz áp dụng chính sách vận chuyển nhanh cho các đơn
+                      hàng giao trong khu vực TP. Hồ Chí Minh, tạo điều kiện
                       thuận lợi nhất cho khách hàng nội thành.
                     </p>
                   </div>
@@ -116,7 +115,7 @@ export function DeliveryPolicy() {
                     <div>
                       <h4 className="font-semibold mb-1">Ngoại tỉnh</h4>
                       <p className="text-sm text-muted-foreground">
-                        Thời gian giao hàng sẽ do Viettel Post xử lý và phụ
+                        Thời gian giao hàng sẽ do Viettel Post, GHN xử lý và phụ
                         thuộc vào lựa chọn vận chuyển của khách hàng.
                       </p>
                     </div>

@@ -92,11 +92,11 @@ const TABS = [
     label: "Lịch sử yêu cầu rút tiền",
     icon: GalleryVerticalEndIcon,
   },
-  {
-    id: "update-security",
-    label: "Cập nhật bảo mật",
-    icon: LockKeyholeIcon,
-  },
+  // {
+  //   id: "update-security",
+  //   label: "Cập nhật bảo mật",
+  //   icon: LockKeyholeIcon,
+  // },
 ];
 export const SuccessWallet = memo(({ user }: SuccessWalletProps) => {
   const [amount, setAmount] = useState("");

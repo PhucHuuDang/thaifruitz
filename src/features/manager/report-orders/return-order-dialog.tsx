@@ -214,7 +214,7 @@ export function ReturnOrderDialog({ orderId }: ReturnOrderDialogProps) {
       );
     });
 
-    console.log({ transformAllItems });
+    // console.log({ transformAllItems });
 
     const invalidItems = transformAllItems.filter(
       (item) => !item.productStatus || item.productStatus.trim() === ""

@@ -26,7 +26,7 @@ const OrderListPage = () => {
 
     return (
       <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-6 justify-between">
-        <h1 className="text-xl font-semibold">Báo Cáo Doanh Thu</h1>
+        <h1 className="text-xl font-semibold">Báo Cáo Đơn hàng</h1>
 
         <DateRangePicker
           align="start"

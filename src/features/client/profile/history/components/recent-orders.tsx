@@ -101,9 +101,9 @@ export const RecentOrders = memo(({ orderData }: RecentOrdersProps) => {
                     <p className="text-sm font-bold text-sky-500">
                       Tổng: {formatVND(order.totalPrice)}
                     </p>
-                    <Button size="sm" variant="outline" className="h-8 gap-1">
+                    {/* <Button size="sm" variant="outline" className="h-8 gap-1">
                       <RefreshCw className="h-3.5 w-3.5" /> Mua lại
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </div>
