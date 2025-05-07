@@ -110,14 +110,14 @@ export const CardProduct = ({
             as="h1"
           >
             <span className="font-semibold">Loại: </span>
-            {categories.slice(0, 3).map((category) => (
+            {categories.slice(0, 2).map((category) => (
               <AdvancedColorfulBadges color="green" size="sm" key={category.id}>
                 {category.name}
               </AdvancedColorfulBadges>
             ))}
-            {categories.length > 3 && (
+            {categories.length > 2 && (
               <span className="text-sm text-gray-500">
-                +{categories.length - 3} nữa
+                +{categories.length - 2} nữa
               </span>
             )}
           </CardItem>
