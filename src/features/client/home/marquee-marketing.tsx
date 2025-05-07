@@ -60,7 +60,7 @@ export const MarqueeMarketing = () => {
   ];
 
   return (
-    <div className="container mx-auto my-10 max-w-7xl rounded-3xl bg-gray-950/5 p-2 ring-1 ring-neutral-700/10 ">
+    <div className="container mx-auto my-10 max-w-11xl rounded-3xl bg-gray-950/5 p-2 ring-1 ring-neutral-700/10 ">
       <ThreeDMarquee images={images} />
     </div>
   );
