@@ -10,7 +10,6 @@ import { HoveredLink, Menu, MenuItem, ProductItem } from "../ui/navbar-menu";
 import { useFetch } from "@/actions/tanstack/use-tanstack-actions";
 import { BlogCategory } from "@/app/(admin)/admin/blog/category/page";
 
-
 import { ApiResponse, Profile } from "@/types/types";
 import Link from "next/link";
 import {
@@ -114,9 +113,9 @@ export const Navigate = () => {
           <Link href="/" className={navItemClassName}>
             Trang chủ
           </Link>
-          <Link href="/find" className={navItemClassName}>
+          {/* <Link href="/find" className={navItemClassName}>
             Sản phẩm
-          </Link>
+          </Link> */}
           <MenuItem
             setActive={setActive}
             active={active}
@@ -126,7 +125,7 @@ export const Navigate = () => {
             <div className="  text-sm grid grid-cols-2 gap-10 p-4">
               <ProductItem
                 title="Tất cả"
-                href="/combo"
+                href="/"
                 src="/images/combo.jpg"
                 description=""
               />
