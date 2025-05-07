@@ -171,7 +171,7 @@ export default function ComboProductCard({ product }: ComboProductCardProps) {
               </div>
 
               <div className="flex items-center  gap-1 mt-1">
-                {product.categories.map((category) => (
+                {product.categories.slice(0, 2).map((category) => (
                   <Badge
                     key={category.id}
                     variant="outline"
@@ -180,6 +180,12 @@ export default function ComboProductCard({ product }: ComboProductCardProps) {
                     {category.name}
                   </Badge>
                 ))}
+
+                {product.categories.length > 3 ? (
+                  <span className="text-sm text-gray-500">
+                    +{product.categories.length - 3} loại
+                  </span>
+                ) : null}
               </div>
             </div>
 
