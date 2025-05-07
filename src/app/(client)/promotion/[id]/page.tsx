@@ -198,7 +198,7 @@ const PromotionPage = () => {
                                                     Đã bán: <strong>{variant.quantitySold}</strong>
                                                 </span>
                                                 <span>
-                                                    Còn lại: <strong>{remaining}</strong>
+                                                    Còn lại: <strong>{remaining > 0 ? remaining : 0}</strong>
                                                 </span>
                                             </div>
                                             <Progress value={soldPercentage} className="h-2" />
@@ -208,6 +208,7 @@ const PromotionPage = () => {
                                             <Button
                                                 className="w-full h-12 text-lg gap-2 bg-sky-600 hover:bg-sky-700 shadow-md hover:shadow-lg transition-all"
                                                 onClick={() => handleAddToCart(variant)}
+                                                disabled={remaining <=0 }
                                             >
                                                 {remaining > 0 ? <>
                                                     <ShoppingCart className="size-8" />

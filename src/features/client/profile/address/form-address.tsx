@@ -131,8 +131,8 @@ function FormAddress({ address, onClose }: Readonly<FormAddressProps>) {
           receiverPhone: phone,
           receiverAddress: `${address}, ${ward.split("-")[1]}, ${district.split("-")[1]
             }, ${province.split("-")[1]}`,
-          longtitude: longitude,
-          latitude: latitude,
+          longtitude: longitude.length > 0 ?  longitude: null ,
+          latitude: latitude.length > 0 ? latitude : null,
           isDefault: isDefault,
           wardId: Number(ward?.split("-")[0]) || 0,
         };

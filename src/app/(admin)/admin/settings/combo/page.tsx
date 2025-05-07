@@ -47,7 +47,7 @@ const ComboPage = () => {
 
     const onSubmit = async (data: z.infer<typeof ComboSettingSafeTypes>) => {
         const { quantity, percentage } = data
-        const comboSettingExisted = comboSettings.find((item) => item.quantity === quantity && item.id !== 0)
+        const comboSettingExisted = comboSettings.find((item) => item.quantity === quantity && item.id !== 0 && editingId !== item.id)
         if (comboSettingExisted) {
             form.setError("quantity", { message: "Số lượng đã tồn tại" })
             return

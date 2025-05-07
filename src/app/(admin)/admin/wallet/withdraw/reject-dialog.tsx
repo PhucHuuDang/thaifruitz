@@ -39,7 +39,7 @@ const DialogRejectRequestWithDrawal = ({ onClose, isOpen, requestWithdrawal }: R
 
             const response = await API.patch(`/Wallets/request-withdrawal/${requestWithdrawal?.id}/reject`, values);
             if (response) {
-                toast.success("Tù chối yêu cầu hoản tiền thành công")
+                toast.success("Tù chối yêu cầu rút tiền thành công")
                 onClose()
                 form.reset()
                 queryClient.invalidateQueries({ queryKey: [WALLET_KEY.REQUEST_WITHDRAWAL] })
@@ -49,7 +49,7 @@ const DialogRejectRequestWithDrawal = ({ onClose, isOpen, requestWithdrawal }: R
         }
     };
 
-    const title = "Từ chối hoàn tiền"
+    const title = "Từ chối rút tiền"
     const buttonText = "Từ chối"
     const loadingLabel = "Đang từ chối..."
     const REJECT_WITHDRAW_REASONS = [
