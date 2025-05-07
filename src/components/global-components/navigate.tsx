@@ -134,8 +134,8 @@ export const Navigate = () => {
                   key={event.id}
                   title={event.name}
                   src={event.image}
-                  href={`/combo?event=${event.name}`}
-                  description=""
+                  href={`/`}
+                  description={event.description}
                 />
               ))}
             </div>
