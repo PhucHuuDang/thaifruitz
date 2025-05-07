@@ -85,8 +85,8 @@ const SuccessBanner = memo(() => (
       Cảm ơn bạn đã đặt hàng và tin tưởng Thaifruiz!
     </h1>
     <p className="text-white text-base max-w-xl mx-auto">
-      Đơn hàng của bạn đã được xác nhận. Chúng tôi sẽ gửi thông tin chi tiết qua
-      email và SMS trong thời gian sớm nhất.
+      Đơn hàng của bạn đã được xác nhận. Bên dưới là thông tin chi tiết bạn đã
+      đặt hàng hãy kiểm tra lại nhé!
     </p>
   </div>
 ));
