@@ -256,6 +256,9 @@ export default function ProductDetail({ product }: ProductDetailProps) {
               numberOfReviews={
                 product?.overallRatingResponse?.quantityFeedback ?? 0
               }
+              overallRatingResponse={
+                product?.overallRatingResponse?.overallRating ?? 0
+              }
             >
               {/* Variant Selection */}
               <VariantSelector

@@ -25,6 +25,7 @@ interface ProductInfoProps {
   children: ReactNode;
 
   numberOfReviews: number;
+  overallRatingResponse: number;
 }
 
 export const ProductInfo = memo(
@@ -36,6 +37,7 @@ export const ProductInfo = memo(
     isInWishlist,
     children,
     numberOfReviews,
+    overallRatingResponse,
   }: ProductInfoProps) => {
     return (
       <div className="p-6 lg:p-8">
@@ -92,11 +94,21 @@ export const ProductInfo = memo(
                 {product.origin}
               </Badge>
               <div className="flex items-center text-amber-500">
+                {/* <Star className="h-4 w-4 fill-amber-500" />
                 <Star className="h-4 w-4 fill-amber-500" />
                 <Star className="h-4 w-4 fill-amber-500" />
                 <Star className="h-4 w-4 fill-amber-500" />
-                <Star className="h-4 w-4 fill-amber-500" />
-                <Star className="h-4 w-4 fill-gray-200" />
+                <Star className="h-4 w-4 fill-gray-200" /> */}
+                {[...Array(5)].map((_, index) => (
+                  <Star
+                    key={index}
+                    className={`h-4 w-4 ${
+                      index < overallRatingResponse
+                        ? "fill-amber-500"
+                        : "fill-gray-200"
+                    }`}
+                  />
+                ))}
                 <span className="text-gray-600 text-sm ml-1">
                   ({numberOfReviews} đánh giá)
                 </span>

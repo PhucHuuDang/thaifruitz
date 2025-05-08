@@ -31,6 +31,8 @@ import { API } from "@/actions/client/api-config";
 import { useSearchParams } from "next/navigation";
 import { RePaymentDialog } from "@/components/custom/_custom-dialog/re-payment-dialog";
 import { OrderItem } from "../../payment/successful/payment-successful.types";
+import { AdvancedColorfulBadges } from "@/components/global-components/badge/advanced-badge";
+import { getOrderType } from "@/utils/label";
 
 interface OrderResponse {
   orders: Order[];
@@ -46,6 +48,7 @@ interface Order {
   discountPrice: number | null;
   paymentStatus: string;
   paymentMethod: string;
+  orderType: string;
   pointUsed: number;
   price: number;
   totalPrice: number;
@@ -262,9 +265,25 @@ export const OrderTrackingPage = () => {
             </div> */}
 
             <div className="px-6 pb-4 border-b bg-gradient-to-bl from-slate-400 rounded-b-3xl via-neutral-400 to-zinc-500 text-white">
+              <div>
+                <span className="font-semibold mr-1">Loại đơn hàng: </span>
+                <AdvancedColorfulBadges
+                  size="md"
+                  color={
+                    (order?.orderType?.toLocaleLowerCase() ?? "buy") === "buy"
+                      ? "green"
+                      : order?.orderType?.toLocaleLowerCase() === "return"
+                      ? "amber"
+                      : "violet"
+                  }
+                  className="text-white font-semibold"
+                >
+                  {getOrderType(order.orderType ?? "buy")}
+                </AdvancedColorfulBadges>
+              </div>
               <div className="flex items-center justify-between h-14">
                 <div className="grid grid-cols-1 sm:grid-cols-2 items-center gap-3">
-                  <span className="font-medium">Trạng thái thanh toán:</span>
+                  <span className="font-semibold">Trạng thái thanh toán:</span>
                   {(() => {
                     const paymentStatusMap: Record<
                       string,

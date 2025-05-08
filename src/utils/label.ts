@@ -47,3 +47,18 @@ export function getUserInitials(name: string): string {
 }
 
 export const returnExchangeLabel = (type: string) => {};
+
+export const getOrderType = (type: string) => {
+  const lowerType = type?.toLowerCase() ?? "";
+
+  switch (lowerType) {
+    case "buy":
+      return "Mua hàng";
+    case "return":
+      return "Trả hàng";
+    case "exchange":
+      return "Đổi hàng";
+    default:
+      return "Khác";
+  }
+};

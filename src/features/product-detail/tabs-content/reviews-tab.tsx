@@ -28,51 +28,6 @@ import { NotData } from "@/components/global-components/no-data";
 import ImagePreview from "@/components/custom/_custom-image/image-preview";
 import { Feedback } from "@/features/feedback/list-feedback";
 
-const reviews = [
-  {
-    user: {
-      name: "Customer",
-      avatar:
-        "https://res.cloudinary.com/deojypwtl/image/upload/v1740025338/avatar/y38odp7hv7zjsxprt9zi",
-    },
-    productVariant: {
-      packagingType: "Túi hút chân không",
-      netWeight: 30,
-      image:
-        "https://res.cloudinary.com/dzn4stvrw/image/upload/v1743918025/k9yqq3yl7cqlx0evkzlf.png",
-    },
-    rating: 3,
-    content:
-      "Chất lượng sản phẩm sấy khô tuyệt vời, không bị quá khô hay quá mềm. Rất thích hợp dùng ăn vặt hàng ngày.",
-    images: [
-      "https://res.cloudinary.com/deojypwtl/image/upload/v1744319646/feedback/h43l2ixmi52gdaq2fr4f.jpg",
-      "https://res.cloudinary.com/deojypwtl/image/upload/v1744319646/feedback/s2tftdswwfsm4m9pfr2m.jpg",
-    ],
-    createdOnUtc: "2025-03-07T12:00:00+00:00",
-  },
-  {
-    user: {
-      name: "Huu Phuc",
-      avatar:
-        "https://res.cloudinary.com/deojypwtl/image/upload/v1744492470/avatar/3633243a95314d52a1e7f1f417de8e8b_cgwlnk.jpg",
-    },
-    productVariant: {
-      packagingType: "Túi lưới",
-      netWeight: 25,
-      image:
-        "https://res.cloudinary.com/dzn4stvrw/image/upload/v1743918023/sgbqyhyiymuafmbveivt.png",
-    },
-    rating: 5,
-    content:
-      "Sản phẩm sấy khô rất ngon, giòn và giữ được hương vị tự nhiên. Đóng gói chắc chắn và sạch sẽ. Rất đáng để mua!",
-    images: [
-      "https://res.cloudinary.com/deojypwtl/image/upload/v1744319646/feedback/opndsizh2nji5k04ofl7.jpg",
-      "https://res.cloudinary.com/deojypwtl/image/upload/v1744319646/feedback/obewnwevtwq4jlys1bcg.jpg",
-    ],
-    createdOnUtc: "2025-03-07T12:00:00+00:00",
-  },
-];
-
 interface ReviewsTabProps {
   overallRatingResponse: OverallRate;
 
@@ -92,10 +47,15 @@ const starRecord: {
 
 export const ReviewsTab = memo(
   ({ overallRatingResponse, productId }: ReviewsTabProps) => {
-    const feedbackData = useFetch<ApiResponse<PageResult<Feedback>>>(
-      `/Feedbacks/product/${productId}`,
-      [FEEDBACK_KEY.FEEDBACK]
-    );
+    const feedbackData = useFetch<
+      ApiResponse<
+        PageResult<
+          Feedback & {
+            rating: number;
+          }
+        >
+      >
+    >(`/Feedbacks/product/${productId}`, [FEEDBACK_KEY.FEEDBACK]);
 
     if (feedbackData.isLoading) {
       return <ReviewSkeleton />;
@@ -211,9 +171,9 @@ export const ReviewsTab = memo(
                 </div>
               </div> */}
 
-              <Button className="w-full mt-6 bg-sky-600 hover:bg-sky-700">
+              {/* <Button className="w-full mt-6 bg-sky-600 hover:bg-sky-700">
                 Viết đánh giá
-              </Button>
+              </Button> */}
             </div>
           </div>
 
@@ -266,21 +226,20 @@ export const ReviewsTab = memo(
                           </div>
                         </div>
                         <div className="flex text-amber-500">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-4 w-4  ${
-                                i < review.stars
-                                  ? "fill-amber-500"
-                                  : "fill-gray-200"
-                              }`}
-                              fill={`${
-                                i < review.stars
-                                  ? "fill-amber-500"
-                                  : "fill-gray-200"
-                              }`}
-                            />
-                          ))}
+                          {[...Array(5)].map((_, i) => {
+                            const rating = review.rating || 5;
+
+                            return (
+                              <Star
+                                key={i}
+                                className={`h-5 w-5 ${
+                                  i < rating
+                                    ? "fill-amber-500"
+                                    : "fill-gray-200 text-gray-200"
+                                }`}
+                              />
+                            );
+                          })}
                         </div>
                       </div>
                       {/* <h4 className="font-medium mb-2">{review.title}</h4> */}

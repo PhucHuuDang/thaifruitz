@@ -23,6 +23,7 @@ import { OrderItem } from "../../payment/successful/payment-successful.types";
 interface Order {
   orderId: string;
   orderStatus: string;
+  orderType: string;
   paymentStatus: string;
   paymentMethod: string;
   buyDate: string;
@@ -161,6 +162,7 @@ const OrderDetailPage = ({
             orderId={order?.value?.orderId}
             paymentMethod={order?.value?.paymentMethod}
             orderStatus={order?.value?.orderStatus}
+            orderType={order?.value?.orderType || "buy"}
             paymentStatus={order?.value?.paymentStatus}
             cancel={order?.value?.cancel ?? null}
             delivery={order?.value?.delivery}

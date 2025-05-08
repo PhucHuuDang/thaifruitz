@@ -53,6 +53,8 @@ import {
 } from "@/components/ui/dialog";
 import { interactApiClient } from "@/actions/client/interact-api-client";
 import { formatAccountNumber } from "./wallet-lib/transaction";
+import { useQueryClient } from "@tanstack/react-query";
+import { USER_KEY } from "@/app/key/user-key";
 
 // Dữ liệu ngân hàng Việt Nam
 const banks = [
@@ -164,6 +166,8 @@ export const WithdrawForm = memo(({ wallet }: WithdrawFormProps) => {
     recipientName: "",
     bankLogo: "",
   });
+
+  const queryClient = useQueryClient();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -285,6 +289,17 @@ export const WithdrawForm = memo(({ wallet }: WithdrawFormProps) => {
 
         return;
       }
+
+      queryClient.invalidateQueries({
+        queryKey: [USER_KEY.PROFILE],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [USER_KEY.REQUEST_WITHDRAWAL],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [USER_KEY.WALLET_TRANSACTION],
+      });
+
       toast.success("Yêu cầu rút tiền đã được gửi thành công");
 
       await new Promise((resolve) => setTimeout(resolve, 1500));

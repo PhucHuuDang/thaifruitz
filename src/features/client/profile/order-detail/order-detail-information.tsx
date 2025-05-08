@@ -23,8 +23,9 @@ import {
   getStatusText,
   isExceptionStatus,
 } from "@/features/manager/report-orders/order-status-badge";
-import { vietnameseDate } from "@/utils/date";
+import { formatRelativeTime, vietnameseDate } from "@/utils/date";
 import { ORDERS_KEY } from "@/app/key/manager-key";
+import { getOrderType } from "@/utils/label";
 
 interface OrderDetailsProps {
   orderId?: string;
@@ -36,6 +37,7 @@ interface OrderDetailsProps {
   delivery: Delivery | undefined;
   orderAddressDelivery: OrderAddressDelivery | undefined;
   timeline: Timeline[] | undefined;
+  orderType: string;
 }
 
 interface Delivery {
@@ -69,6 +71,7 @@ const OrderDetailInformation: React.FC<Readonly<OrderDetailsProps>> = ({
   cancel,
   delivery,
   orderAddressDelivery,
+  orderType = "buy",
   timeline = [],
 }) => {
   const [isCancel, setIsCancel] = useState<boolean>(false);
@@ -151,9 +154,16 @@ const OrderDetailInformation: React.FC<Readonly<OrderDetailsProps>> = ({
 
           <div className="flex justify-between items-center">
             <span className="text-gray-700 font-semibold">Ngày đặt:</span>
-            <span className="text-gray-900 underline">
-              {vietnameseDate(orderDate, true)}
-            </span>
+
+            <div className="flex flex-col gap-2">
+              <span className="text-gray-900 underline font-semibold">
+                {vietnameseDate(orderDate, true)}
+              </span>
+
+              <span className="text-sky-500 font-semibold underline">
+                {formatRelativeTime(orderDate)}
+              </span>
+            </div>
           </div>
 
           <div className="flex justify-between items-center">
@@ -182,6 +192,19 @@ const OrderDetailInformation: React.FC<Readonly<OrderDetailsProps>> = ({
               }`}
             >
               {paymentStatusColors[paymentStatus]?.text || "Không xác định"}
+            </span>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <span className="text-gray-700 font-semibold">Loại đơn hàng:</span>
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-semibold   ${
+                paymentStatusColors[paymentStatus]?.color ||
+                "bg-gray-100 text-gray-800"
+              }`}
+            >
+              {getOrderType(orderType)}
+              {/* {paymentStatusColors[paymentStatus]?.text || "Không xác định"} */}
             </span>
           </div>
 
