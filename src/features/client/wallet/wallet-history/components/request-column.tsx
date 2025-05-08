@@ -13,6 +13,7 @@ import {
   Copy,
   Eye,
   FileText,
+  ImageIcon,
   LandmarkIcon,
   MoreHorizontal,
   SquareChartGanttIcon,
@@ -42,6 +43,7 @@ import { formatRelativeTime, vietnameseDate } from "@/utils/date";
 import { placeholderImage } from "@/utils/label";
 import { CancelWithdrawalDialog } from "./actions/cancel-request";
 import { formatAccountNumber } from "../../wallet-lib/transaction";
+import ImagePreview from "@/components/custom/_custom-image/image-preview";
 
 export type WithdrawalRequest = {
   id: string;
@@ -70,7 +72,8 @@ const getStatusConfig = (status: string) => {
       };
     case "Rejected":
       return {
-        color: "bg-rose-100 text-rose-800 hover:bg-rose-200 border-rose-200 p-2",
+        color:
+          "bg-rose-100 text-rose-800 hover:bg-rose-200 border-rose-200 p-2",
         icon: "❌",
         label: "Từ chối",
       };
@@ -84,7 +87,8 @@ const getStatusConfig = (status: string) => {
 
     case "Cancelled":
       return {
-        color: "bg-rose-100 text-rose-800 hover:bg-rose-200 border-rose-200 p-2",
+        color:
+          "bg-rose-100 text-rose-800 hover:bg-rose-200 border-rose-200 p-2",
         icon: "❌",
         label: "Hủy yêu cầu",
       };
@@ -110,8 +114,7 @@ export const requestHistoryColumns: ColumnDef<WithdrawalRequest>[] = [
     header: ({ column }) => {
       return (
         <div className="flex items-center justify-start">
-
-          <BarcodeIcon className="size-5 mr-1"/>
+          <BarcodeIcon className="size-5 mr-1" />
           <span className="font-semibold text-slate-700">Mã yêu cầu</span>
           {/* <ArrowUpDown className="ml-1 h-3.5 w-3.5 text-slate-500" /> */}
         </div>
@@ -126,7 +129,9 @@ export const requestHistoryColumns: ColumnDef<WithdrawalRequest>[] = [
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center space-x-1">
-                <span className="font-semibold text-slate-700">{shortId}...</span>
+                <span className="font-semibold text-slate-700">
+                  {shortId}...
+                </span>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -207,7 +212,7 @@ export const requestHistoryColumns: ColumnDef<WithdrawalRequest>[] = [
       export: { pdf: { header: "Ngân hàng" }, csv: { header: "Ngân hàng" } },
     },
     minSize: 700,
-    size: 700
+    size: 700,
   },
 
   {
@@ -225,26 +230,25 @@ export const requestHistoryColumns: ColumnDef<WithdrawalRequest>[] = [
       const status = row.getValue("requestWithdrawalType") as string;
       const config = getStatusConfig(status);
 
-      const reason = row.original.reason
+      const reason = row.original.reason;
 
       return (
         <div className="flex flex-col items-center gap-1">
-
-        <Badge
-          variant="outline"
-          className={`${config.color} font-semibold px-2.5 py-0.5 flex items-center gap-1`}
+          <Badge
+            variant="outline"
+            className={`${config.color} font-semibold px-2.5 py-0.5 flex items-center gap-1`}
           >
-          <SquareChartGanttIcon className="size-4 mr-1 text-slate-700 text-sm" />
-          <span className="mr-1">{config.icon}</span>
-          {config.label}
-        </Badge>
+            <SquareChartGanttIcon className="size-4 mr-1 text-slate-700 text-sm" />
+            <span className="mr-1">{config.icon}</span>
+            {config.label}
+          </Badge>
 
-       {reason && (
-         <span className={`italic text-xs font-semibold text-slate-800`}>
-         {reason}
-         </span>
-       )}
-          </div>
+          {reason && (
+            <span className={`italic text-xs font-semibold text-slate-800`}>
+              {reason}
+            </span>
+          )}
+        </div>
       );
     },
     // filterFn: (row, id, value) => {
@@ -261,7 +265,7 @@ export const requestHistoryColumns: ColumnDef<WithdrawalRequest>[] = [
     header: ({ column }) => {
       return (
         <div className="flex items-center justify-start">
-          <Banknote />
+          <Banknote className="mr-1" />
 
           <span className="font-semibold text-slate-700">Số tiền</span>
         </div>
@@ -290,22 +294,22 @@ export const requestHistoryColumns: ColumnDef<WithdrawalRequest>[] = [
     header: ({ column }) => {
       return (
         <div className="flex items-center justify-start">
-          <StickyNoteIcon />
+          <StickyNoteIcon className="mr-1" />
 
-          <span className="font-semibold text-slate-700">Số tiền</span>
+          <span className="font-semibold text-slate-700">Ghi chú</span>
         </div>
       );
     },
     cell: ({ row }) => {
-      const note = row.getValue("note") as string
+      const note = row.getValue("note") as string;
 
       return (
-       note && (
-        <span className="font-semibold text-slate-700 flex items-center gap-1">
-        <StickyNoteIcon className="mr-1" />
-        {note}
-      </span>
-       )
+        note && (
+          <span className="font-semibold text-slate-700 flex items-center gap-1">
+            <StickyNoteIcon className="mr-1" />
+            {note}
+          </span>
+        )
       );
     },
 
@@ -321,7 +325,7 @@ export const requestHistoryColumns: ColumnDef<WithdrawalRequest>[] = [
     header: ({ column }) => {
       return (
         <div className="flex items-center justify-start">
-          <StickyNoteIcon />
+          <ImageIcon className="mr-1" />
 
           <span className="font-semibold text-slate-700">Ảnh đính kèm</span>
         </div>
@@ -330,27 +334,35 @@ export const requestHistoryColumns: ColumnDef<WithdrawalRequest>[] = [
     cell: ({ row }) => {
       const imageUrl = row.getValue("image") as string;
 
-      
-
       return (
         imageUrl && (
-          <Image
-          src={imageUrl}
-          alt={`Ảnh đính kèm từ quản lý ${row.original.id}`}
-          width={60} // kích thước nhỏ gọn cho bảng
-          height={60}
-          className="object-cover rounded"
-        />
-       )
+          // <Image
+          //   src={imageUrl}
+          //   alt={`Ảnh đính kèm từ quản lý ${row.original.id}`}
+          //   width={60} // kích thước nhỏ gọn cho bảng
+          //   height={60}
+          //   className="object-cover rounded"
+          // />
+          <ImagePreview
+            images={[imageUrl]}
+            alt={`Ảnh đính kèm từ quản lý ${row.original.id}`}
+            initialHeight={80}
+            initialWidth={80}
+            className="object-cover rounded-xl"
+          />
+        )
       );
     },
 
     meta: {
       align: "center",
-      export: { pdf: { header: "Ảnh đính kèm" }, csv: { header: "Ảnh đính kèm" } },
+      export: {
+        pdf: { header: "Ảnh đính kèm" },
+        csv: { header: "Ảnh đính kèm" },
+      },
     },
   },
-  
+
   {
     id: "createdOnUtc",
     accessorKey: "createdOnUtc",
@@ -387,7 +399,7 @@ export const requestHistoryColumns: ColumnDef<WithdrawalRequest>[] = [
       export: { pdf: { header: "Ngày tạo" }, csv: { header: "Ngày tạo" } },
     },
 
-    minSize: 400
+    minSize: 400,
   },
 
   {
@@ -407,7 +419,7 @@ export const requestHistoryColumns: ColumnDef<WithdrawalRequest>[] = [
       const formattedDate = vietnameseDate(date, true);
       const relativeDate = formatRelativeTime(date);
 
-      return (
+      return date ? (
         <div className="flex flex-col">
           <span className="flex items-center text-sm font-semibold text-slate-700">
             <Calendar className="mr-1 size-6 text-slate-500" />
@@ -418,17 +430,21 @@ export const requestHistoryColumns: ColumnDef<WithdrawalRequest>[] = [
             {relativeDate}
           </span>
         </div>
+      ) : (
+        <span className="font-semibold text-slate-600">---</span>
       );
     },
 
     meta: {
       align: "center",
-      export: { pdf: { header: "Ngày được xử lý" }, csv: { header: "Ngày được xử lý" } },
+      export: {
+        pdf: { header: "Ngày được xử lý" },
+        csv: { header: "Ngày được xử lý" },
+      },
     },
 
-    minSize: 400
+    minSize: 400,
   },
-
 
   {
     id: "actions",
@@ -457,7 +473,7 @@ export const requestHistoryColumns: ColumnDef<WithdrawalRequest>[] = [
             <DropdownMenuContent align="end" className="w-[180px]">
               <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <Button
+              {/* <Button
                 className="flex items-center cursor-pointer w-full"
                 onClick={() => {
                   // Xử lý xem chi tiết
@@ -467,11 +483,11 @@ export const requestHistoryColumns: ColumnDef<WithdrawalRequest>[] = [
               >
                 <ViewIcon className="mr-1 h-4 w-4" />
                 <span>Xem chi tiết</span>
-              </Button>
+              </Button> */}
 
               <CancelWithdrawalDialog requestWithdrawalId={request.id} />
 
-              {request.image && (
+              {/* {request.image && (
                 <DropdownMenuItem
                   className="flex items-center cursor-pointer"
                   onClick={() => {
@@ -482,17 +498,16 @@ export const requestHistoryColumns: ColumnDef<WithdrawalRequest>[] = [
                   <FileText className="mr-2 h-4 w-4" />
                   <span>Xem chứng từ</span>
                 </DropdownMenuItem>
-              )}
+              )} */}
 
-              <Button
+              {/* <Button
                 className="flex items-center cursor-pointer w-full"
                 onClick={() => copyToClipboard(request.id)}
-
                 variant="outline"
               >
                 <Copy className="mr-2 h-4 w-4" />
                 <span>Sao chép mã</span>
-              </Button>
+              </Button> */}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
