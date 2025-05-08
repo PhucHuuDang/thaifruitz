@@ -48,7 +48,7 @@ const DialogRequestWithDrawal = ({ onClose, isOpen, requestWithdrawal }: Readonl
 
             const response = await API.update(`/Wallets/${requestWithdrawal?.id}/request-withdrawal`, formData);
             if (response) {
-                toast.success("Cập nhật yêu cầu hoản tiền thành công")
+                toast.success("Cập nhật yêu cầu rút tiền thành công")
                 onClose()
                 form.reset()
                 queryClient.invalidateQueries({ queryKey: [WALLET_KEY.REQUEST_WITHDRAWAL] })
@@ -57,7 +57,7 @@ const DialogRequestWithDrawal = ({ onClose, isOpen, requestWithdrawal }: Readonl
             console.log({ error });
         }
     };
-    const title = "Cập nhật hoàn tiền"
+    const title = "Cập nhật rút tiền"
     const buttonText = "Cập nhật"
     const loadingLabel = "Đang cập nhật..."
     return (

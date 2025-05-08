@@ -58,6 +58,11 @@ const data = {
       icon: BookOpen,
       items: [
         {
+          title: "Sản phẩm",
+          url: "/manager/product",
+          icon: BookOpen,
+        },
+        {
           title: "Sản phẩm trong kho",
           url: "/manager/inventory",
           icon: BookKey,
@@ -108,11 +113,11 @@ const data = {
       url: "/manager/blog",
       icon: NewspaperIcon,
     },
-    {
-      name: "Quản Lý Sự Kiện",
-      url: "/manager/event",
-      icon: TicketPercent,
-    },
+    // {
+    //   name: "Quản Lý Sự Kiện",
+    //   url: "/manager/event",
+    //   icon: TicketPercent,
+    // },
     {
       name: "Các phản hồi",
       url: "/manager/feedback",
@@ -128,36 +133,36 @@ const data = {
       url: "/manager/product-batch",
       icon: Import,
     },
-    {
-      name: "Chứng chỉ",
-      url: "/manager/certification",
-      icon: ShieldCheck,
-    },
-    {
-      name: "Khuyến mãi",
-      url: "/manager/promotion",
-      icon: Fan,
-    },
-    {
-      name: "Gói quà",
-      url: "/manager/combo",
-      icon: Gift,
-    },
-    {
-      name: "Báo cáo biến thể",
-      url: "/manager/dashboard",
-      icon: ChartPie,
-    },
-    {
-      name: "Loại sản phẩm",
-      url: "/manager/category",
-      icon: TableProperties,
-    },
-    {
-      name: "Mã giảm giá",
-      url: "/manager/voucher",
-      icon: TicketPercent,
-    },
+    // {
+    //   name: "Chứng chỉ",
+    //   url: "/manager/certification",
+    //   icon: ShieldCheck,
+    // },
+    // {
+    //   name: "Khuyến mãi",
+    //   url: "/manager/promotion",
+    //   icon: Fan,
+    // },
+    // {
+    //   name: "Gói quà",
+    //   url: "/manager/combo",
+    //   icon: Gift,
+    // },
+    // {
+    //   name: "Báo cáo biến thể",
+    //   url: "/manager/dashboard",
+    //   icon: ChartPie,
+    // },
+    // {
+    //   name: "Loại sản phẩm",
+    //   url: "/manager/category",
+    //   icon: TableProperties,
+    // },
+    // {
+    //   name: "Mã giảm giá",
+    //   url: "/manager/voucher",
+    //   icon: TicketPercent,
+    // },
   ],
 };
 

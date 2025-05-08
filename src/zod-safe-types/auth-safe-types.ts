@@ -45,11 +45,11 @@ export const RegisterSafeTypes = z.object({
     .max(100, 'Họ và tên không thể dài quá 100 ký tự'),
   password: z.string({
     required_error: "Vui lòng nhập mật khẩu"
-  }).min(5, { message: "Mật khẩu lớn hơn hoặc bằng 5 kí tứ" }).max(32, { message: "Mật khẩu bé hơn hoặc bằng 32 kí tự" }),
+  }).min(5, { message: "Mật khẩu lớn hơn hoặc bằng 5 kí tự" }).max(32, { message: "Mật khẩu bé hơn hoặc bằng 32 kí tự" }),
   type: z.string(),
   confirmPassword: z.string({
     required_error: "Vui lòng nhập xác nhận mật khẩu"
-  }).min(5, { message: "Mật khẩu lớn hơn hoặc bằng 5 kí tứ" }).max(32, { message: "Mật khẩu bé hơn hoặc bằng 32 kí tự" }),
+  }).min(5, { message: "Mật khẩu lớn hơn hoặc bằng 5 kí tự" }).max(32, { message: "Mật khẩu bé hơn hoặc bằng 32 kí tự" }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Xác nhận mật khẩu không khớp",
   path: ["confirmPassword"],
