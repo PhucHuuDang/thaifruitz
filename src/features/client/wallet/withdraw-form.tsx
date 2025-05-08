@@ -354,10 +354,10 @@ export const WithdrawForm = memo(({ wallet }: WithdrawFormProps) => {
     return balance >= 10000 || isInCommonAmounts;
   }, [wallet?.balance]);
 
-  console.log({ isEligibleToWithdraw });
+  // console.log({ isEligibleToWithdraw });
 
   return (
-    <div className="w-full mx-auto p-4 relative">
+    <div className="w-full mx-auto p-4 relative motion-preset-slide-right ">
       <Card
         className={cn(
           "overflow-hidden cardStyle w-full relative",

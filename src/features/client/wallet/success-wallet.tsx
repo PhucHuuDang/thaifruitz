@@ -172,7 +172,7 @@ export const SuccessWallet = memo(({ user }: SuccessWalletProps) => {
       </ScrollArea>
 
       {tab === "success-wallet" ? (
-        <div className="flex flex-col items-center justify-center py-8 space-y-6 w-full">
+        <div className="flex flex-col items-center justify-center py-8 space-y-6 w-full motion-preset-slide-right">
           <div className="rounded-full bg-green-100 p-6">
             <ShieldCheck className="h-12 w-12 text-green-600" />
           </div>
@@ -380,7 +380,7 @@ export const SuccessWallet = memo(({ user }: SuccessWalletProps) => {
                 label: "Hãy thử tải lại!",
                 onClick: () => requestWithdrawData.refetch(),
               }}
-              className="min-w-full h-full"
+              className="min-w-full h-full motion-preset-slide-right"
             />
           )
         ) : (

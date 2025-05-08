@@ -139,7 +139,7 @@ export const TransactionHistoryWallet = memo(
       : 0;
 
     return (
-      <div className="container mx-auto py-6">
+      <div className="container mx-auto py-6 motion-preset-slide-right">
         <div className="space-y-6">
           {/* Filters and search */}
           <div className="flex flex-col sm:flex-row gap-4">
