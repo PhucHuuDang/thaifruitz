@@ -31,7 +31,7 @@ import {
   ZoomInIcon,
 } from "lucide-react";
 import { memo, useCallback, useState } from "react";
-import { ProductDetailTypes } from "../product-detail.types";
+import { Certificate, ProductDetailTypes } from "../product-detail.types";
 import { isAfter, isBefore, parseISO } from "date-fns";
 import {
   Tooltip,
@@ -144,7 +144,7 @@ export const CertificateTab = memo(
     return (
       <div className="p-6 lg:p-8 motion-opacity-in-0 motion-preset-slide-right motion-blur-in-md rounded-b-3xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {productCertification.map((cert) => {
+          {productCertification.map((cert: Certificate) => {
             const status = getCertificateStatus(cert.expiryDate);
             const remainingDays = getRemainingDays(cert.expiryDate);
 

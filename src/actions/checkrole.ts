@@ -27,6 +27,7 @@ export const checkRole = async (roles: string[]) => {
   try {
     const decode: DecodeData = jwtDecode<DecodeData>(token?.accessToken);
     const userRole = decode.Role.toUpperCase();
+    // console.log({ decode });
     return roles.find((role) => role.toUpperCase() === userRole);
   } catch (error) {
     console.log({ error });
