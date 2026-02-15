@@ -7,15 +7,6 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === "production",
   },
 
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
-  rules: {
-    "no-console": "off", // Example: Disable `no-console` rule
-    "react/no-unescaped-entities": "off", // Disable warning for unescaped entities
-    // Add or modify rules as needed
-  },
   images: {
     remotePatterns: [
       {
