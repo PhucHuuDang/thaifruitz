@@ -71,10 +71,19 @@ export default {
           "dark-bg": "var(--shiki-dark-bg)",
         },
       },
+      fontFamily: {
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        mira: "0px 2px 3px 0px hsl(0 0% 0% / 0.16)",
+      },
+      letterSpacing: {
+        mira: "-0.025em",
       },
       keyframes: {
         "accordion-down": {

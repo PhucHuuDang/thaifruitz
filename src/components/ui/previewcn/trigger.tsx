@@ -30,7 +30,7 @@ export function Trigger({ onClick }: TriggerProps) {
   return (
     <button
       onClick={onClick}
-      className="fixed right-4 bottom-4 z-99999 inline-flex size-12 cursor-pointer items-center justify-center rounded-full border border-neutral-50/20 bg-neutral-900 text-neutral-50 transition-all duration-180 hover:border-neutral-50/30 focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-violet-400"
+      className="fixed right-4 bottom-4 z-[99999] inline-flex size-12 cursor-pointer items-center justify-center rounded-full border border-neutral-50/20 bg-neutral-900 text-neutral-50 transition-all duration-180 hover:border-neutral-50/30 focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-violet-400"
       aria-label="Open previewcn theme editor"
       title="previewcn Theme Editor"
     >

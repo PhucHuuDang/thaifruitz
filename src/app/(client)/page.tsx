@@ -203,7 +203,7 @@ const ClientPage = async () => {
         </Suspense>
 
         {/* Value Propositions Section - NEW */}
-        <section className="py-12 md:py-16 bg-gradient-to-b from-amber-50/30 to-white">
+        <section className="py-12 md:py-16 bg-gradient-to-b from-orange-50/40 via-amber-50/30 to-background">
           <div className="container mx-auto px-4 md:px-6">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-stone-800 mb-8 md:mb-12">
               Tại sao chọn ThaiFruitz?

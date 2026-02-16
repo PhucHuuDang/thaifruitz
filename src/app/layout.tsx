@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Figtree } from "next/font/google";
 import "./globals.css";
 import { metaConfig } from "@/lib/config";
 import { FloatingButton } from "@/components/global-components/floating-menu";
@@ -12,14 +12,11 @@ import { DataProvider } from "@/providers/data-provider";
 import SignalRProvider from "@/providers/signalr-provider";
 
 import { PreviewcnDevtools } from "@/components/ui/previewcn";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const figtree = Figtree({
+  variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -89,7 +86,7 @@ export default function RootLayout({
     <html lang="vi" suppressHydrationWarning={true}>
       <body
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${figtree.variable} antialiased font-sans`}
       >
         {process.env.NODE_ENV === "development" && <PreviewcnDevtools />}
         <QueryProvider>

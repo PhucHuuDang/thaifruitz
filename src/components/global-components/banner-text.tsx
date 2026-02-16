@@ -21,7 +21,7 @@ export const BannerText = () => {
         y: 0,
       }}
       transition={{ duration: 0.6 }}
-      className="z-50 flex flex-col items-center justify-center gap-6 px-4"
+      className="z-10 flex flex-col items-center justify-center gap-6 px-4"
     >
       {/* Glassmorphism container for text */}
       <div className="backdrop-blur-md bg-black/20 rounded-3xl p-6 md:p-8 border border-white/10">
