@@ -11,6 +11,7 @@ import { AuthProvider } from "@/providers/auth-provider";
 import { DataProvider } from "@/providers/data-provider";
 import SignalRProvider from "@/providers/signalr-provider";
 
+import { PreviewcnDevtools } from "@/components/ui/previewcn";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -90,6 +91,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {process.env.NODE_ENV === "development" && <PreviewcnDevtools />}
         <QueryProvider>
           <AuthProvider>
             <DataProvider>

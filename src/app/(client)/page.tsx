@@ -307,16 +307,16 @@ const ClientPage = async () => {
         </Suspense>
 
         {/* Categories */}
-        <Suspense
+        {/* <Suspense
           fallback={
             <div className="h-80 animate-pulse bg-slate-100 rounded-2xl mx-4" />
           }
         >
           <CategorySlide />
-        </Suspense>
+        </Suspense> */}
 
         {/* Testimonials */}
-        {feedbackData.length > 0 && (
+        {/* {feedbackData.length > 0 && (
           <section className="py-12 md:py-16">
             <div className="container mx-auto px-4 md:px-6">
               <h2 className="text-3xl md:text-4xl font-bold text-center text-stone-800 mb-8 md:mb-12">
@@ -331,7 +331,7 @@ const ClientPage = async () => {
               </Suspense>
             </div>
           </section>
-        )}
+        )} */}
 
         {/* Blog Content */}
         <Suspense
