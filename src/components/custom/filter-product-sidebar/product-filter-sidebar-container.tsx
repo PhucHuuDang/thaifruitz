@@ -33,7 +33,7 @@ export const ProductFilterSidebarContainer = () => {
       <EmptyState
         icons={[StickyNote]}
         title="Chưa có sản phẩm"
-        description="Có vẻ như chưa có sản phảm nào hãy tải lại trang"
+        description="Có vẻ như chưa có sản phẩm nào hãy tải lại trang"
         className="min-w-full flex flex-col"
         action={{
           label: "Tải lại",
@@ -44,18 +44,18 @@ export const ProductFilterSidebarContainer = () => {
   }
 
   const safeProducts: Product[] = products?.value?.items ?? [];
-
   const safeCombos: ComboProduct[] = combos?.value?.items ?? [];
 
   return (
-    <div className="p-4">
+    <section
+      aria-label="Lọc và duyệt sản phẩm"
+      className="px-2 sm:px-4 py-4 sm:py-6"
+    >
       <ProductFilterSidebar
-        products={safeProducts as Product[]}
+        products={safeProducts}
         combos={safeCombos}
         comboRefetch={comboRefetch}
       />
-    </div>
+    </section>
   );
-
-  // products.
 };

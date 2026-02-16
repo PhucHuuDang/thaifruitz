@@ -1,22 +1,21 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ChevronRight,
   Grid3X3,
   Search,
   SlidersHorizontal,
-  Star,
   X,
   Box,
   StickyNote,
   PackagePlus,
   LucideIcon,
+  Sparkles,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 import {
   Select,
@@ -25,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   Sidebar,
   SidebarInset,
@@ -33,7 +31,7 @@ import {
 } from "@/components/ui/sidebar";
 
 import { Product } from "@/hooks/use-cart-store";
-import { memo, useCallback, useEffect, useState } from "react";
+import { memo, startTransition, useCallback, useMemo, useState } from "react";
 import {
   CardProduct,
   CardProductProps,
@@ -48,48 +46,80 @@ import { EmptyState } from "@/components/global-components/empty-state";
 import { CustomComboBuilder } from "@/features/client/home/custom-combo/custom-combo-builder";
 import { VercelTab } from "../_custom_tabs/vercel-tabs";
 
-const TABS: {
-  id: string;
-  label: string;
-  icon: LucideIcon;
-}[] = [
-  {
-    id: "tab-1",
-    label: "Tất cả sản phẩm",
-    icon: Grid3X3,
-  },
-  {
-    id: "tab-2",
-    label: "Combo sản phẩm",
-    icon: Box,
-  },
-  {
-    id: "tab-3",
-    label: "Bạn có muốn tạo Combo?",
-    icon: PackagePlus,
-  },
+// ─── Constants ──────────────────────────────────────────────────────────
+const TABS: { id: string; label: string; icon: LucideIcon }[] = [
+  { id: "tab-1", label: "Tất cả sản phẩm", icon: Grid3X3 },
+  { id: "tab-2", label: "Combo sản phẩm", icon: Box },
+  { id: "tab-3", label: "Bạn có muốn tạo Combo?", icon: PackagePlus },
 ];
 
-// Extract unique categories, package types, etc. from the data
-const extractUniqueValues = (products: Product[] | []) => {
+const sortOptions = [
+  { value: "popular", label: "Phổ biến nhất" },
+  { value: "newest", label: "Mới nhất" },
+  { value: "priceAsc", label: "Giá: Thấp đến cao" },
+  { value: "priceDesc", label: "Giá: Cao đến thấp" },
+  { value: "rating", label: "Đánh giá cao nhất" },
+  { value: "bestSelling", label: "Bán chạy nhất" },
+];
+
+const popularFilters = [
+  { id: "organic", name: "Hữu cơ", count: 24 },
+  { id: "no-sugar", name: "Không đường", count: 18 },
+  { id: "high-protein", name: "Chất đạm", count: 12 },
+  { id: "gluten-free", name: "Gluten Free", count: 32 },
+];
+
+// ─── Animation Variants ─────────────────────────────────────────────────
+const cardVariants = {
+  hidden: { opacity: 0, y: 16, scale: 0.97 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      delay: i * 0.04,
+      duration: 0.3,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  }),
+  exit: {
+    opacity: 0,
+    scale: 0.95,
+    transition: { duration: 0.2, ease: "easeIn" },
+  },
+};
+
+const badgeVariants = {
+  initial: { opacity: 0, scale: 0.8, x: -8 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    x: 0,
+    transition: { duration: 0.2, ease: "easeOut" },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.8,
+    x: -8,
+    transition: { duration: 0.15, ease: "easeIn" },
+  },
+};
+
+// ─── Helpers ────────────────────────────────────────────────────────────
+
+const extractUniqueValues = (products: Product[]) => {
   const categories = new Set<string>();
   const packageTypes = new Set<string>();
   const tags = new Set<string>();
-  const colors = new Set();
+  const colors = new Set<string>();
   let minPrice = Number.POSITIVE_INFINITY;
   let maxPrice = 0;
   let minWeight = Number.POSITIVE_INFINITY;
   let maxWeight = 0;
 
   products?.forEach((product) => {
-    product.categories.forEach((category) => {
-      categories.add(category.name);
-    });
-
-    product.tags?.forEach((tag: string) => {
-      tags.add(tag);
-    });
-
+    product.categories.forEach((category) => categories.add(category.name));
+    product.tags?.forEach((tag: string) => tags.add(tag));
     product.variant.forEach((variant) => {
       packageTypes.add(variant.packageType);
       minPrice = Math.min(minPrice, variant.price);
@@ -97,8 +127,6 @@ const extractUniqueValues = (products: Product[] | []) => {
       minWeight = Math.min(minWeight, variant.netWeight);
       maxWeight = Math.max(maxWeight, variant.netWeight);
     });
-
-    // add more options
   });
 
   return {
@@ -111,26 +139,9 @@ const extractUniqueValues = (products: Product[] | []) => {
   };
 };
 
-// Sort options
-const sortOptions = [
-  { value: "popular", label: "Phổ biến nhất" },
-  { value: "newest", label: "Mới nhất" },
-  { value: "priceAsc", label: "Giá: Thấp đến cao" },
-  { value: "priceDesc", label: "Giá: Cao đến thấp" },
-  { value: "rating", label: "Đánh giá cao nhất" },
-  { value: "bestSelling", label: "Bán chạy nhất" },
-];
-
-// Popular filters
-const popularFilters = [
-  { id: "organic", name: "Hữu cơ", count: 24 },
-  { id: "no-sugar", name: "Không đường", count: 18 },
-  { id: "high-protein", name: "Chất đạm", count: 12 },
-  { id: "gluten-free", name: "Gluten Free", count: 32 },
-];
+// ─── Types ──────────────────────────────────────────────────────────────
 
 export type FilterTypes = {
-  // categories: CategoryTypes[];
   categories: string[];
   packageTypes: string[];
   tags: string[];
@@ -140,28 +151,26 @@ export type FilterTypes = {
   hasPromotion: boolean;
   inStock: boolean;
   searchQuery: string;
-
   nutritionRange: Record<string, number[]>;
-  // nutritionRange: {
-  //   calories: number[];
-  //   protein: number[];
-  //   carbs: number[];
-  //   fat: number[];
-  // };
 };
 
 interface ProductFilterSidebarProps {
-  products: Product[] | [];
-
-  combos: ComboProduct[] | [];
-
+  products: Product[];
+  combos: ComboProduct[];
   comboRefetch: () => void;
 }
 
+// ─── Component ──────────────────────────────────────────────────────────
+
 export const ProductFilterSidebar = memo(
   ({ products, combos, comboRefetch }: ProductFilterSidebarProps) => {
-    const { categories, packageTypes, tags, colors, priceRange, weightRange } =
-      extractUniqueValues(products);
+    const shouldReduceMotion = useReducedMotion();
+
+    // Memoize extracted unique values — only recompute when products change
+    const { categories, packageTypes, tags, priceRange, weightRange } = useMemo(
+      () => extractUniqueValues(products),
+      [products],
+    );
 
     const [filters, setFilters] = useState<FilterTypes>({
       categories: [],
@@ -182,19 +191,12 @@ export const ProductFilterSidebar = memo(
     });
 
     const [sortBy, setSortBy] = useState("popular");
-    const [activeFiltersCount, setActiveFiltersCount] = useState(0);
-    const [filteredProducts, setFilteredProducts] = useState<Product[] | []>(
-      []
-    );
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
-    const [viewMode, setViewMode] = useState("grid");
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [wishlist, setWishlist] = useState<string[] | []>([]);
-    const [compareList, setCompareList] = useState<string[] | []>([]);
-
-    const [recentlyViewed, setRecentlyViewed] = useState<
-      CardProductProps[] | []
-    >([]);
+    const [wishlist, setWishlist] = useState<string[]>([]);
+    const [compareList, setCompareList] = useState<string[]>([]);
+    const [recentlyViewed, setRecentlyViewed] = useState<CardProductProps[]>(
+      [],
+    );
     const [savedFilters, setSavedFilters] = useState([
       {
         id: 1,
@@ -207,21 +209,12 @@ export const ProductFilterSidebar = memo(
         filters: { categories: [], hasPromotion: true },
       },
     ]);
-
     const [searchQuery, setSearchQuery] = useState("");
+    const [tab, setTab] = useState("tab-1");
 
-    // Simulate loading
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-        setFilteredProducts(products);
-      }, 1500);
+    // ─── Derived state via useMemo (replaces 3 useEffect hooks) ───────
 
-      return () => clearTimeout(timer);
-    }, [products]);
-
-    // Update active filters count
-    useEffect(() => {
+    const activeFiltersCount = useMemo(() => {
       let count = 0;
       if (filters.categories.length > 0) count++;
       if (filters.packageTypes.length > 0) count++;
@@ -240,162 +233,125 @@ export const ProductFilterSidebar = memo(
       if (filters.hasPromotion) count++;
       if (filters.inStock) count++;
       if (filters.searchQuery) count++;
-
       if (
-        filters.nutritionRange.protein[0] > 0 ||
-        filters.nutritionRange.protein[1] < 5
+        filters.nutritionRange.protein?.[0] > 0 ||
+        filters.nutritionRange.protein?.[1] < 5
       )
         count++;
       if (
-        filters.nutritionRange.carbs[0] > 0 ||
-        filters.nutritionRange.carbs[1] < 40
+        filters.nutritionRange.carbs?.[0] > 0 ||
+        filters.nutritionRange.carbs?.[1] < 40
       )
         count++;
-
-      setActiveFiltersCount(count);
+      return count;
     }, [filters, priceRange, weightRange]);
 
-    // Apply filters to products
-    useEffect(() => {
-      if (isLoading) return;
-
+    const filteredProducts = useMemo(() => {
       const filtered = products.filter((product) => {
-        // Filter by search query
-
-        const matchesSearch =
+        // Search query filter
+        if (
           filters.searchQuery &&
           !toLowerCaseNonAccentVietnamese(product.name).includes(
-            toLowerCaseNonAccentVietnamese(filters.searchQuery)
+            toLowerCaseNonAccentVietnamese(filters.searchQuery),
           ) &&
-          !product.variant.some((variantItem) =>
-            toLowerCaseNonAccentVietnamese(variantItem.packageType)
+          !product.variant.some((v) =>
+            toLowerCaseNonAccentVietnamese(v.packageType)
               .toLowerCase()
-              .includes(toLowerCaseNonAccentVietnamese(filters.searchQuery))
-          );
+              .includes(toLowerCaseNonAccentVietnamese(filters.searchQuery)),
+          )
+        ) {
+          return false;
+        }
 
-        if (matchesSearch) return false;
-
-        // Filter by categories
+        // Category filter
         if (filters.categories.length > 0) {
-          const productCategories = product.categories.map((c) => c.name);
-          if (
-            !filters.categories.some((cat) => productCategories.includes(cat))
-          ) {
+          const productCats = product.categories.map((c) => c.name);
+          if (!filters.categories.some((cat) => productCats.includes(cat))) {
             return false;
           }
         }
 
-        // Filter by tags
+        // Tag filter
         if (filters.tags.length > 0) {
           if (
             !product.tags ||
-            !filters.tags.some(
-              (tag: string) => product.tags && product?.tags.includes(tag)
-            )
+            !filters.tags.some((tag) => product.tags?.includes(tag))
           ) {
             return false;
           }
         }
 
-        // Check variants for other filters
+        // Variant-level filters
         const hasMatchingVariant = product.variant.some((variant) => {
-          // Filter by package type
           if (
             filters.packageTypes.length > 0 &&
             !filters.packageTypes.includes(variant.packageType)
-          ) {
+          )
             return false;
-          }
-
-          // Filter by price range
           if (
             variant.price < filters.priceRange[0] ||
             variant.price > filters.priceRange[1]
-          ) {
+          )
             return false;
-          }
-
-          // Filter by weight range
           if (
             variant.netWeight < filters.weightRange[0] ||
             variant.netWeight > filters.weightRange[1]
-          ) {
+          )
             return false;
-          }
-
-          // Filter by promotion
-          if (filters.hasPromotion && !variant.promotion) {
-            return false;
-          }
-
-          // Filter by stock
-          if (filters.inStock && variant.stockQuantity <= 0) {
-            return false;
-          }
-
+          if (filters.hasPromotion && !variant.promotion) return false;
+          if (filters.inStock && variant.stockQuantity <= 0) return false;
           return true;
         });
 
-        const parseNumber = (value: string | number): number => {
-          return typeof value === "string" ? parseFloat(value) : value;
-        };
-
+        // Nutrition facts filter
         if (product.nutritionFacts) {
+          const parseNum = (v: string | number) =>
+            typeof v === "string" ? parseFloat(v) : v;
           const {
             calories = 0,
             protein = 0,
             carbs = 0,
             fat = 0,
           } = product.nutritionFacts;
-
-          const parsedCalories = parseNumber(calories);
-          const parsedProtein = parseNumber(protein);
-          const parsedCarbs = parseNumber(carbs);
-          const parsedFat = parseNumber(fat);
-
-          console.log(parsedCalories, parsedProtein);
-
           const { nutritionRange } = filters;
 
-          if (
-            parsedCalories > (nutritionRange.calories?.[0] ?? 0) ||
-            parsedCalories < (nutritionRange.calories?.[1] ?? 200)
-          ) {
-            return false;
-          }
+          const pCal = parseNum(calories);
+          const pPro = parseNum(protein);
+          const pCarb = parseNum(carbs);
+          const pFat = parseNum(fat);
 
           if (
-            parsedProtein > (nutritionRange.protein?.[0] ?? 0) ||
-            parsedProtein < (nutritionRange.protein?.[1] ?? 5)
-          ) {
+            pCal > (nutritionRange.calories?.[0] ?? 0) ||
+            pCal < (nutritionRange.calories?.[1] ?? 200)
+          )
             return false;
-          }
-
           if (
-            parsedCarbs > (nutritionRange.carbs?.[0] ?? 0) ||
-            parsedCarbs < (nutritionRange.carbs?.[1] ?? 40)
-          ) {
+            pPro > (nutritionRange.protein?.[0] ?? 0) ||
+            pPro < (nutritionRange.protein?.[1] ?? 5)
+          )
             return false;
-          }
-
           if (
-            parsedFat > (nutritionRange.fat?.[0] ?? 0) ||
-            parsedFat < (nutritionRange.fat?.[1] ?? 5)
-          ) {
+            pCarb > (nutritionRange.carbs?.[0] ?? 0) ||
+            pCarb < (nutritionRange.carbs?.[1] ?? 40)
+          )
             return false;
-          }
+          if (
+            pFat > (nutritionRange.fat?.[0] ?? 0) ||
+            pFat < (nutritionRange.fat?.[1] ?? 5)
+          )
+            return false;
         }
 
         return hasMatchingVariant;
       });
 
-      // Sort products
-      const sorted = [...filtered].sort((a, b) => {
+      // Sort
+      return [...filtered].sort((a, b) => {
         switch (sortBy) {
           case "popular":
             return b.quantitySold - a.quantitySold;
           case "newest":
-            return 0; // Assuming no date field in the sample data
+            return 0;
           case "priceAsc":
             return (
               (a.variant[0].promotion?.price || a.variant[0].price) -
@@ -414,100 +370,104 @@ export const ProductFilterSidebar = memo(
             return 0;
         }
       });
+    }, [filters, sortBy, products]);
 
-      setFilteredProducts(sorted);
-    }, [filters, sortBy, isLoading, products]);
+    // ─── Stable callbacks ─────────────────────────────────────────────
 
-    const handleCategoryChange = (category: string) => {
-      setFilters((prev: FilterTypes) => {
-        const newCategories = prev.categories.includes(category)
-          ? prev.categories.filter((c) => c !== category)
-          : [...prev.categories, category];
+    const updateFilters = useCallback(
+      (updater: (prev: FilterTypes) => FilterTypes) => {
+        startTransition(() => {
+          setFilters(updater);
+        });
+      },
+      [],
+    );
 
-        return { ...prev, categories: newCategories };
-      });
-    };
+    const handleCategoryChange = useCallback(
+      (category: string) => {
+        updateFilters((prev) => ({
+          ...prev,
+          categories: prev.categories.includes(category)
+            ? prev.categories.filter((c) => c !== category)
+            : [...prev.categories, category],
+        }));
+      },
+      [updateFilters],
+    );
 
     const handlePackageTypeChange = useCallback(
       (packageType: string) => {
-        setFilters((prev) => ({
+        updateFilters((prev) => ({
           ...prev,
           packageTypes: prev.packageTypes.includes(packageType)
             ? prev.packageTypes.filter((p) => p !== packageType)
             : [...prev.packageTypes, packageType],
         }));
       },
-      [setFilters]
+      [updateFilters],
     );
 
     const handleTagChange = useCallback(
       (tag: string) => {
-        setFilters((prev) => {
-          const newTags = prev.tags.includes(tag)
+        updateFilters((prev) => ({
+          ...prev,
+          tags: prev.tags.includes(tag)
             ? prev.tags.filter((t) => t !== tag)
-            : [...prev.tags, tag];
-
-          return { ...prev, tags: newTags };
-        });
+            : [...prev.tags, tag],
+        }));
       },
-      [setFilters]
+      [updateFilters],
     );
 
     const handlePriceRangeChange = useCallback(
       (value: number[]) => {
-        setFilters((prev) => ({ ...prev, priceRange: value }));
+        updateFilters((prev) => ({ ...prev, priceRange: value }));
       },
-      [setFilters]
+      [updateFilters],
     );
 
     const handleWeightRangeChange = useCallback(
       (value: number[]) => {
-        setFilters((prev) => ({ ...prev, weightRange: value }));
+        updateFilters((prev) => ({ ...prev, weightRange: value }));
       },
-      [setFilters]
+      [updateFilters],
     );
 
     const handlePromotionChange = useCallback(
       (checked: boolean) => {
-        setFilters((prev) => ({ ...prev, hasPromotion: checked }));
+        updateFilters((prev) => ({ ...prev, hasPromotion: checked }));
       },
-      [setFilters]
+      [updateFilters],
     );
 
-    const handleInStockChange = useCallback((checked: boolean) => {
-      setFilters((prev) => ({ ...prev, inStock: checked }));
-    }, []);
+    const handleInStockChange = useCallback(
+      (checked: boolean) => {
+        updateFilters((prev) => ({ ...prev, inStock: checked }));
+      },
+      [updateFilters],
+    );
 
     const handleSearchChange = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value.toString().toLowerCase());
-
-        // setFilters((prev) => ({ ...prev, searchQuery: e.target.value }));
+        const value = e.target.value.toString().toLowerCase();
+        setSearchQuery(value);
+        // Debounced filter update via startTransition
+        startTransition(() => {
+          setFilters((prev) => ({ ...prev, searchQuery: value }));
+        });
       },
-      [setSearchQuery]
+      [],
     );
 
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        setFilters((prev) => ({ ...prev, searchQuery }));
-      }, 200);
-
-      return () => clearTimeout(timer);
-    }, [searchQuery]);
-
-    const handleNutritionRangeChange = (
-      nutrient: keyof typeof filters.nutritionRange,
-      // value: [number, number]
-      value: number[]
-    ) => {
-      setFilters((prev) => ({
-        ...prev,
-        nutritionRange: {
-          ...prev.nutritionRange,
-          [nutrient]: value,
-        },
-      }));
-    };
+    const handleNutritionRangeChange = useCallback(
+      (nutrient: string, value: number[]) => {
+        updateFilters((prev) => ({
+          ...prev,
+          nutritionRange: { ...prev.nutritionRange, [nutrient]: value },
+        }));
+      },
+      [updateFilters],
+    );
 
     const resetFilters = useCallback(() => {
       setFilters({
@@ -527,37 +487,24 @@ export const ProductFilterSidebar = memo(
           fat: [0, 5],
         },
       });
-    }, [setFilters, priceRange, weightRange]);
+      setSearchQuery("");
+    }, [priceRange, weightRange]);
 
-    const toggleWishlist = (productVariantId: string) => {
-      setWishlist((prev: string[]) =>
+    const toggleCompare = useCallback((productVariantId: string) => {
+      setCompareList((prev) =>
         prev.includes(productVariantId)
-          ? prev.filter((id: string) => id !== productVariantId)
-          : [...prev, productVariantId]
-      );
-    };
-
-    const toggleCompare = useCallback(
-      (productVariantId: string) => {
-        setCompareList((prev: string[]) =>
-          prev.includes(productVariantId)
-            ? prev.filter((id) => id !== productVariantId)
-            : prev.length < 3
+          ? prev.filter((id) => id !== productVariantId)
+          : prev.length < 3
             ? [...prev, productVariantId]
-            : prev
-        );
-      },
-      [setCompareList]
-    );
+            : prev,
+      );
+    }, []);
 
     const applySavedFilter = useCallback(
-      (savedFilter: any) => {
-        setFilters((prev) => ({
-          ...prev,
-          ...savedFilter.filters,
-        }));
+      (savedFilter: { filters: Partial<FilterTypes> }) => {
+        updateFilters((prev) => ({ ...prev, ...savedFilter.filters }));
       },
-      [setFilters]
+      [updateFilters],
     );
 
     const saveCurrentFilter = useCallback(() => {
@@ -574,81 +521,55 @@ export const ProductFilterSidebar = memo(
         },
       };
       setSavedFilters((prev: any) => [...prev, newFilter]);
-    }, [setSavedFilters, filters, savedFilters]);
+    }, [filters, savedFilters.length]);
 
-    const renderStarRating = (rating: number) => {
-      return (
-        <div className="flex items-center">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <Star
-              key={star}
-              className={`h-3 w-3 ${
-                star <= Math.round(rating)
-                  ? "text-yellow-400 fill-yellow-400"
-                  : "text-gray-300"
-              }`}
-            />
-          ))}
-          <span className="ml-1 text-xs text-slate-700">
-            {rating.toFixed(1)}
-          </span>
-        </div>
-      );
-    };
+    // ─── Animation helpers ────────────────────────────────────────────
 
-    const renderProductSkeleton = () => (
-      <div className={viewMode === "grid" ? "" : "col-span-full"}>
-        <Card
-          className={`overflow-hidden h-full flex ${
-            viewMode === "grid" ? "flex-col" : "flex-row"
-          }`}
+    const getAnimProps = (i: number) =>
+      shouldReduceMotion
+        ? {}
+        : {
+            custom: i,
+            variants: cardVariants,
+            initial: "hidden",
+            animate: "visible",
+            exit: "exit",
+          };
+
+    // ─── Render Active Filter Badges ──────────────────────────────────
+
+    const renderActiveBadge = (
+      key: string,
+      label: string,
+      onRemove: () => void,
+    ) => (
+      <motion.div
+        key={key}
+        variants={badgeVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        layout
+      >
+        <AdvancedColorfulBadges
+          color="violet"
+          className="flex items-center gap-1.5 rounded-full px-3 py-1 cursor-pointer hover:opacity-80 transition-opacity duration-200"
         >
-          <div
-            className={`${
-              viewMode === "grid" ? "aspect-square" : "w-1/4 min-w-[200px]"
-            } bg-muted/30`}
-          >
-            <Skeleton className="h-full w-full" />
-          </div>
-          <div
-            className={`flex flex-col ${viewMode === "grid" ? "" : "flex-1"}`}
-          >
-            <CardContent
-              className={`flex-1 ${viewMode === "grid" ? "p-4" : "p-5"}`}
-            >
-              <div className="mb-2 flex items-center justify-between">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-4 w-16" />
-              </div>
-              <Skeleton className="h-6 w-3/4 mb-2" />
-              <Skeleton className="h-4 w-full mb-1" />
-              <Skeleton className="h-4 w-2/3" />
-              <div className="mt-3 flex gap-2">
-                <Skeleton className="h-6 w-16 rounded-full" />
-                <Skeleton className="h-6 w-16 rounded-full" />
-              </div>
-            </CardContent>
-            <CardFooter
-              className={`${
-                viewMode === "grid" ? "p-4 pt-0" : "p-5 pt-0"
-              } flex items-center justify-between`}
-            >
-              <Skeleton className="h-6 w-20" />
-              <Skeleton className="h-9 w-32 rounded-md" />
-            </CardFooter>
-          </div>
-        </Card>
-      </div>
+          {label}
+          <X
+            className="h-3 w-3 cursor-pointer hover:text-red-500 transition-colors duration-200"
+            onClick={onRemove}
+          />
+        </AdvancedColorfulBadges>
+      </motion.div>
     );
 
-    const [tab, setTab] = useState("tab-1");
+    // ─── Render ───────────────────────────────────────────────────────
 
     return (
-      // <div className="bg-white min-h-screen p-4">
-      // <SidebarProvider className="p-4 has-[[data-variant=inset]]:bg-white">
-      <SidebarProvider className="p-4 has-[[data-variant=inset]]:bg-gradient-to-b from-amber-50 to-amber-50/60 rounded-3xl">
+      <SidebarProvider className="p-2 sm:p-4 has-[[data-variant=inset]]:bg-gradient-to-b from-amber-50/80 to-white rounded-2xl sm:rounded-3xl">
         <Sidebar
-          className="hidden md:flex h-[calc(100vh-2rem)] sticky top-4 overflow-hidden  "
+          className="hidden md:flex h-[calc(100vh-2rem)] sticky top-4 overflow-hidden"
           variant="inset"
         >
           <FilterSidebar
@@ -678,309 +599,277 @@ export const ProductFilterSidebar = memo(
             priceRange={priceRange}
             packageTypes={packageTypes}
             categories={categories}
-            filteredProducts={filteredProducts || []}
+            filteredProducts={filteredProducts}
           />
         </Sidebar>
 
-        <SidebarInset className="overflow-hidden bg-white cardStyle">
-          <div className="space-y-6 w-full cardStyle">
-            {/* Mobile Filter Button */}
-            <div className="md:hidden sticky top-0 z-10  pb-4">
+        <SidebarInset className="overflow-hidden bg-white/80 backdrop-blur-sm cardStyle rounded-2xl">
+          <div
+            className="space-y-4 sm:space-y-6 w-full cardStyle"
+            role="region"
+            aria-label="Danh sách sản phẩm"
+          >
+            {/* ─── Mobile Filter Button ────────────────────────────── */}
+            <div className="md:hidden sticky top-0 z-10 backdrop-blur-xl bg-white/90 px-3 py-3 border-b border-white/20 shadow-sm">
               <Button
                 variant="outline"
-                className="w-full flex items-center justify-between border-slate-700/20"
+                className="w-full flex items-center justify-between border-slate-200 hover:border-amber-300 hover:bg-gradient-to-r hover:from-amber-50 hover:to-yellow-50 transition-all duration-200 h-11 rounded-xl shadow-sm"
                 onClick={() => setIsMobileFilterOpen(true)}
               >
-                <div className="flex items-center">
-                  <SlidersHorizontal className="mr-2 h-4 w-4 text-slate-700" />
-                  <span>Bộ lọc</span>
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="h-4 w-4 text-amber-600" />
+                  <span className="font-medium text-sm text-stone-800">
+                    Bộ lọc
+                  </span>
                   {activeFiltersCount > 0 && (
-                    <Badge variant="secondary" className="ml-2">
+                    <Badge
+                      variant="secondary"
+                      className="h-5 min-w-5 rounded-full text-xs bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 border border-amber-200/50"
+                    >
                       {activeFiltersCount}
                     </Badge>
                   )}
                 </div>
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-4 w-4 text-slate-400" />
               </Button>
             </div>
 
-            {/* Sort and Results Count */}
-            <div className="flex flex-col min-w-full sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-lg">
-              <div>
-                <h2 className="font-medium text-slate-700">
-                  Lọc sản phẩm ({filteredProducts?.length})
-                </h2>
-                {activeFiltersCount > 0 && (
-                  <span className="text-sm text-slate-700">
-                    Đang áp dụng {activeFiltersCount} bộ lọc
-                  </span>
-                )}
+            {/* ─── Sort & Results Header ───────────────────────────── */}
+            <div className="flex flex-col gap-4 px-3 sm:px-5 pt-3 sm:pt-5">
+              {/* Results count + sort */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <motion.div
+                    className="h-8 w-8 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center shadow-sm"
+                    whileHover={{ rotate: 180 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Sparkles className="h-4 w-4 text-amber-600" />
+                  </motion.div>
+                  <div>
+                    <h2 className="font-semibold text-stone-800 text-base">
+                      Sản phẩm{" "}
+                      <span className="text-slate-500 font-normal text-sm">
+                        ({filteredProducts.length})
+                      </span>
+                    </h2>
+                    {activeFiltersCount > 0 && (
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Đang áp dụng {activeFiltersCount} bộ lọc
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-full sm:w-[200px] h-10 rounded-xl border-slate-200 hover:border-slate-300 transition-colors duration-200">
+                    <SelectValue placeholder="Sắp xếp theo" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    {sortOptions.map((option) => (
+                      <SelectItem
+                        key={option.value}
+                        value={option.value}
+                        className="rounded-lg cursor-pointer"
+                      >
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              <VercelTab
-                tabs={TABS}
-                activeTab={tab}
-                onTabChange={setTab}
-                classNameContent="text-slate-800  gap-1"
-              />
-
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Sắp xếp theo" />
-                </SelectTrigger>
-                <SelectContent>
-                  {sortOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {/* Tabs */}
+              <div className="overflow-x-auto scrollbar-hide -mx-3 px-3">
+                <VercelTab
+                  tabs={TABS}
+                  activeTab={tab}
+                  onTabChange={setTab}
+                  classNameContent="text-slate-800 gap-1 whitespace-nowrap"
+                />
+              </div>
             </div>
 
-            {/* Active Filters */}
-            {activeFiltersCount > 0 && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {filters.categories.length > 0 &&
-                  filters.categories.map((category) => (
-                    <AdvancedColorfulBadges
-                      key={category}
-                      color="violet"
-                      className="flex items-center gap-1 rounded-3xl"
-                    >
-                      {category}
-                      <X
-                        className="h-3 w-3 cursor-pointer"
-                        onClick={() => handleCategoryChange(category)}
-                      />
-                    </AdvancedColorfulBadges>
-                  ))}
-                {filters.packageTypes.length > 0 &&
-                  filters.packageTypes.map((packageType) => (
-                    <AdvancedColorfulBadges
-                      key={packageType}
-                      color="violet"
-                      className="flex items-center gap-1 rounded-3xl"
-                    >
-                      {packageType}
-                      <X
-                        className="h-3 w-3 cursor-pointer"
-                        onClick={() => handlePackageTypeChange(packageType)}
-                      />
-                    </AdvancedColorfulBadges>
-                  ))}
-                {filters.tags.length > 0 &&
-                  filters.tags.map((tag) => (
-                    <AdvancedColorfulBadges
-                      key={tag}
-                      color="violet"
-                      className="flex items-center gap-1 rounded-3xl"
-                    >
-                      {tag}
-                      <X
-                        className="h-3 w-3 cursor-pointer"
-                        onClick={() => handleTagChange(tag)}
-                      />
-                    </AdvancedColorfulBadges>
-                  ))}
-                {(filters.priceRange?.[0] > priceRange.min ||
-                  filters.priceRange?.[1] < priceRange.max) && (
-                  <AdvancedColorfulBadges
-                    color="violet"
-                    className="flex items-center gap-1 rounded-3xl"
-                  >
-                    Giá: {filters.priceRange?.[0].toLocaleString()}đ -{" "}
-                    {filters.priceRange?.[1].toLocaleString()}đ
-                    <X
-                      className="h-3 w-3 cursor-pointer"
-                      onClick={() =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          priceRange: [priceRange.min, priceRange.max],
-                        }))
-                      }
-                    />
-                  </AdvancedColorfulBadges>
-                )}
+            {/* ─── Active Filter Badges ────────────────────────────── */}
+            <AnimatePresence mode="popLayout">
+              {activeFiltersCount > 0 && (
+                <motion.div
+                  className="flex flex-wrap gap-2 px-3 sm:px-5"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                >
+                  <AnimatePresence mode="popLayout">
+                    {filters.categories.map((category) =>
+                      renderActiveBadge(`cat-${category}`, category, () =>
+                        handleCategoryChange(category),
+                      ),
+                    )}
 
-                {(filters.weightRange?.[0] > weightRange.min ||
-                  filters.weightRange?.[1] < weightRange.max) && (
-                  <AdvancedColorfulBadges
-                    color="violet"
-                    className="flex items-center gap-1 rounded-3xl"
-                  >
-                    Trọng lượng: {filters.weightRange[0]} -{" "}
-                    {filters.weightRange[1]}
-                    <X
-                      className="h-3 w-3 cursor-pointer"
-                      onClick={() =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          weightRange: [weightRange.min, weightRange.max],
-                        }))
-                      }
-                    />
-                  </AdvancedColorfulBadges>
-                )}
+                    {filters.packageTypes.map((packageType) =>
+                      renderActiveBadge(`pkg-${packageType}`, packageType, () =>
+                        handlePackageTypeChange(packageType),
+                      ),
+                    )}
 
-                {(filters.nutritionRange?.calories?.[0] > 0 ||
-                  filters.nutritionRange?.calories?.[1] < 200) && (
-                  <AdvancedColorfulBadges
-                    color="violet"
-                    className="flex items-center gap-1 rounded-3xl"
-                  >
-                    Calories: {filters.nutritionRange?.calories?.[0]}kcal -{" "}
-                    {filters.nutritionRange?.calories?.[1]}kcal
-                    <X
-                      className="h-3 w-3 cursor-pointer"
-                      onClick={() =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          nutritionRange: {
-                            ...(prev.nutritionRange || {}),
-                            calories: [0, 200],
-                          },
-                        }))
-                      }
-                    />
-                  </AdvancedColorfulBadges>
-                )}
+                    {filters.tags.map((tag) =>
+                      renderActiveBadge(`tag-${tag}`, tag, () =>
+                        handleTagChange(tag),
+                      ),
+                    )}
 
-                {(filters?.nutritionRange?.protein?.[0] > 0 ||
-                  filters?.nutritionRange?.protein?.[1] < 5) && (
-                  <AdvancedColorfulBadges
-                    color="violet"
-                    className="flex items-center gap-1 rounded-3xl"
-                  >
-                    Protein: {filters.nutritionRange?.protein?.[0]}g -{" "}
-                    {filters.nutritionRange?.protein?.[1]}g
-                    <X
-                      className="h-3 w-3 cursor-pointer"
-                      onClick={() =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          nutritionRange: {
-                            ...(prev.nutritionRange || {}),
-                            protein: [0, 5],
-                          },
-                        }))
-                      }
-                    />
-                  </AdvancedColorfulBadges>
-                )}
-                {(filters?.nutritionRange?.carbs?.[0] > 0 ||
-                  filters?.nutritionRange?.carbs?.[1] < 40) && (
-                  <AdvancedColorfulBadges
-                    color="violet"
-                    className="flex items-center gap-1 rounded-3xl"
-                  >
-                    Carbs: {filters?.nutritionRange?.carbs?.[0]}g -{" "}
-                    {filters?.nutritionRange?.carbs?.[1]}g
-                    <X
-                      className="h-3 w-3 cursor-pointer"
-                      onClick={() =>
-                        setFilters((prev) => ({
-                          ...prev,
-                          nutritionRange: {
-                            ...(prev.nutritionRange || {}),
-                            carbs: [0, 40],
-                          },
-                        }))
-                      }
-                    />
-                  </AdvancedColorfulBadges>
-                )}
+                    {(filters.priceRange?.[0] > priceRange.min ||
+                      filters.priceRange?.[1] < priceRange.max) &&
+                      renderActiveBadge(
+                        "price",
+                        `Giá: ${filters.priceRange[0].toLocaleString()}đ - ${filters.priceRange[1].toLocaleString()}đ`,
+                        () =>
+                          updateFilters((prev) => ({
+                            ...prev,
+                            priceRange: [priceRange.min, priceRange.max],
+                          })),
+                      )}
 
-                {filters.hasPromotion && (
-                  <AdvancedColorfulBadges
-                    color="violet"
-                    className="flex items-center gap-1 rounded-3xl"
-                  >
-                    Có khuyến mãi
-                    <X
-                      className="h-3 w-3 cursor-pointer"
-                      onClick={() =>
-                        setFilters((prev) => ({
+                    {(filters.weightRange?.[0] > weightRange.min ||
+                      filters.weightRange?.[1] < weightRange.max) &&
+                      renderActiveBadge(
+                        "weight",
+                        `Trọng lượng: ${filters.weightRange[0]} - ${filters.weightRange[1]}`,
+                        () =>
+                          updateFilters((prev) => ({
+                            ...prev,
+                            weightRange: [weightRange.min, weightRange.max],
+                          })),
+                      )}
+
+                    {(filters.nutritionRange?.calories?.[0] > 0 ||
+                      filters.nutritionRange?.calories?.[1] < 200) &&
+                      renderActiveBadge(
+                        "cal",
+                        `Calories: ${filters.nutritionRange.calories[0]}kcal - ${filters.nutritionRange.calories[1]}kcal`,
+                        () =>
+                          updateFilters((prev) => ({
+                            ...prev,
+                            nutritionRange: {
+                              ...prev.nutritionRange,
+                              calories: [0, 200],
+                            },
+                          })),
+                      )}
+
+                    {(filters.nutritionRange?.protein?.[0] > 0 ||
+                      filters.nutritionRange?.protein?.[1] < 5) &&
+                      renderActiveBadge(
+                        "pro",
+                        `Protein: ${filters.nutritionRange.protein[0]}g - ${filters.nutritionRange.protein[1]}g`,
+                        () =>
+                          updateFilters((prev) => ({
+                            ...prev,
+                            nutritionRange: {
+                              ...prev.nutritionRange,
+                              protein: [0, 5],
+                            },
+                          })),
+                      )}
+
+                    {(filters.nutritionRange?.carbs?.[0] > 0 ||
+                      filters.nutritionRange?.carbs?.[1] < 40) &&
+                      renderActiveBadge(
+                        "carbs",
+                        `Carbs: ${filters.nutritionRange.carbs[0]}g - ${filters.nutritionRange.carbs[1]}g`,
+                        () =>
+                          updateFilters((prev) => ({
+                            ...prev,
+                            nutritionRange: {
+                              ...prev.nutritionRange,
+                              carbs: [0, 40],
+                            },
+                          })),
+                      )}
+
+                    {filters.hasPromotion &&
+                      renderActiveBadge("promo", "Có khuyến mãi", () =>
+                        updateFilters((prev) => ({
                           ...prev,
                           hasPromotion: false,
-                        }))
-                      }
-                    />
-                  </AdvancedColorfulBadges>
-                )}
-                {filters.inStock && (
-                  <AdvancedColorfulBadges
-                    color="violet"
-                    className="flex items-center gap-1 rounded-3xl"
-                  >
-                    Còn hàng
-                    <X
-                      className="h-3 w-3 cursor-pointer"
-                      onClick={() =>
-                        setFilters((prev) => ({ ...prev, inStock: false }))
-                      }
-                    />
-                  </AdvancedColorfulBadges>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={resetFilters}
-                  className="text-slate-700 hover:text-slate-80 transition duration-300"
-                >
-                  Xóa tất cả
-                </Button>
-              </div>
-            )}
+                        })),
+                      )}
 
-            {/* Product Grid */}
-            {isLoading ? (
-              <div
-                className={`grid grid-cols-1 w-full ${
-                  viewMode === "grid" ? "sm:grid-cols-2 lg:grid-cols-3" : ""
-                } gap-6`}
-              >
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2, delay: index * 0.05 }}
-                  >
-                    {renderProductSkeleton()}
+                    {filters.inStock &&
+                      renderActiveBadge("stock", "Còn hàng", () =>
+                        updateFilters((prev) => ({
+                          ...prev,
+                          inStock: false,
+                        })),
+                      )}
+                  </AnimatePresence>
+
+                  <motion.div layout>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={resetFilters}
+                      className="text-slate-500 hover:text-red-500 hover:bg-red-50 transition-all duration-200 text-xs h-7 rounded-full"
+                    >
+                      <X className="h-3 w-3 mr-1" />
+                      Xóa tất cả
+                    </Button>
                   </motion.div>
-                ))}
-              </div>
-            ) : filteredProducts?.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 rounded-lg">
-                <div className=" p-4 rounded-full">
-                  <Search className="h-8 w-8 text-slate-700" />
-                </div>
-                <h3 className="mt-4 text-lg font-medium text-slate-700">
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* ─── Product Grid ─────────────────────────────────────── */}
+            {filteredProducts.length === 0 ? (
+              <motion.div
+                className="flex flex-col items-center justify-center py-20 px-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+              >
+                <motion.div
+                  className="h-20 w-20 rounded-2xl bg-gradient-to-br from-amber-100 to-yellow-50 flex items-center justify-center mb-5 shadow-lg"
+                  animate={{
+                    scale: [1, 1.05, 1],
+                    rotate: [0, 5, -5, 0],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <Search className="h-9 w-9 text-amber-500" />
+                </motion.div>
+                <h3 className="text-lg font-semibold text-stone-800 mb-2">
                   Không tìm thấy sản phẩm phù hợp
                 </h3>
-                <span className="mt-2 text-slate-700 text-center max-w-md">
+                <p className="text-sm text-slate-500 text-center max-w-md mb-6 leading-relaxed">
                   Không tìm thấy sản phẩm nào phù hợp với bộ lọc của bạn. Hãy
                   thử điều chỉnh lại bộ lọc.
-                </span>
+                </p>
                 <Button
                   variant="outline"
-                  className="mt-6"
                   onClick={resetFilters}
+                  className="rounded-xl hover:bg-gradient-to-r hover:from-amber-50 hover:to-yellow-50 hover:border-amber-300 transition-all duration-200 h-10 shadow-sm"
                 >
                   Xóa tất cả bộ lọc
                 </Button>
-              </div>
+              </motion.div>
             ) : tab === "tab-1" ? (
-              <div
-                className={`w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 p-4 gap-4 `}
-              >
-                <AnimatePresence>
-                  {filteredProducts?.map((product) => {
-                    return product.variant.map((variantItem) => {
-                      return (
+              <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 px-3 sm:px-5 pb-6 gap-4 sm:gap-5">
+                <AnimatePresence mode="popLayout">
+                  {filteredProducts.map((product, productIdx) =>
+                    product.variant.map((variantItem, variantIdx) => (
+                      <motion.div
+                        key={variantItem.productVariantId}
+                        {...getAnimProps(
+                          productIdx * product.variant.length + variantIdx,
+                        )}
+                        layout
+                      >
                         <CardProduct
-                          key={variantItem.productVariantId}
                           categories={product.categories}
                           description={product.description}
                           productId={product.id}
@@ -994,30 +883,25 @@ export const ProductFilterSidebar = memo(
                           type="single"
                           disabled={variantItem.stockQuantity < 1}
                         />
-                      );
-                    });
-                  })}
+                      </motion.div>
+                    )),
+                  )}
                 </AnimatePresence>
               </div>
             ) : tab === "tab-2" ? (
               combos.length ? (
-                <div
-                  className={`w-full grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 p-4 `}
-                >
-                  {combos.map((combo) => {
-                    return (
-                      <ComboProductCard
-                        key={combo.id}
-                        product={{ ...combo, type: "combo" }}
-                      />
-                    );
-                  })}
+                <div className="w-full grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 sm:gap-5 px-3 sm:px-5 pb-6">
+                  {combos.map((combo, i) => (
+                    <motion.div key={combo.id} {...getAnimProps(i)} layout>
+                      <ComboProductCard product={{ ...combo, type: "combo" }} />
+                    </motion.div>
+                  ))}
                 </div>
               ) : (
                 <EmptyState
                   icons={[StickyNote]}
                   title="Chưa có Combo sản phẩm nào!"
-                  description="Có vẻ như chưa có  Combo sản phẩm nào hãy tải lại trang"
+                  description="Có vẻ như chưa có Combo sản phẩm nào hãy tải lại trang"
                   className="min-w-full flex flex-col"
                   action={{
                     label: "Tải lại",
@@ -1027,14 +911,16 @@ export const ProductFilterSidebar = memo(
               )
             ) : (
               tab === "tab-3" && (
-                <CustomComboBuilder productsData={filteredProducts} />
+                <div className="px-3 sm:px-5 pb-6">
+                  <CustomComboBuilder productsData={filteredProducts} />
+                </div>
               )
             )}
           </div>
         </SidebarInset>
       </SidebarProvider>
     );
-  }
+  },
 );
 
 ProductFilterSidebar.displayName = "ProductFilterSidebar";

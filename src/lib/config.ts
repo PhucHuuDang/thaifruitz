@@ -1,7 +1,21 @@
 export const metaConfig = {
-  title: "ThaiFruitz",
+  title: "ThaiFruitz - Trái Cây Sấy Organic Cao Cấp Việt Nam",
   description:
-    "A Web Application for Thai Fruits Lovers, bring products from local farmers to your doorsteps, fresh and fast, out products will be one of the best snacks foods organic, help you enjoy with the entertainment moments.",
+    "Mua trái cây sấy organic chất lượng cao, không đường, không chất bảo quản. Sản phẩm từ nông dân địa phương. Giao hàng nhanh toàn quốc. Ưu đãi đặc biệt cho khách hàng mới.",
+
+  baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "https://thaifruitz.com",
+
+  keywords: [
+    "trái cây sấy",
+    "trái cây sấy organic",
+    "dried fruit vietnam",
+    "healthy snack",
+    "không đường",
+    "không chất bảo quản",
+    "thai fruitz",
+    "snack healthy",
+    "organic food vietnam",
+  ],
 
   icon: [
     {
