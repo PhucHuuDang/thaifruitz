@@ -1,170 +1,83 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import AnimatedLoadingSkeleton from "./animated-loading-skeleton";
 
-export default function ProductSkeletonWithSidebar() {
+export function ProductGridSkeleton() {
   return (
-    <div className="flex flex-col md:flex-row w-full max-w-7xl mx-auto gap-4 p-4 bg-gray-50">
-      {/* Sidebar skeleton - now with rounded-3xl */}
-      <div className="w-full md:w-64 bg-white rounded-3xl shadow-sm p-5 h-fit">
-        {/* Logo and search */}
-        <div className="mb-6">
-          <div className="h-8 w-24 bg-gray-200 rounded-md animate-pulse mb-4"></div>
-          <div className="relative">
-            <div className="h-10 w-full bg-gray-200 rounded-full animate-pulse"></div>
-            <div className="absolute left-3 top-3 h-4 w-4 bg-gray-300 rounded-full animate-pulse"></div>
+    <div className="w-full space-y-4 p-4">
+      {/* Toolbar skeleton */}
+      <div className="rounded-2xl border border-border/40 p-4 space-y-3">
+        {/* Search + Sort + Filter row */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex-1 h-10 bg-muted/60 rounded-xl animate-pulse" />
+          <div className="flex gap-2">
+            <div className="h-10 w-[180px] bg-muted/60 rounded-xl animate-pulse" />
+            <div className="h-10 w-24 bg-muted/60 rounded-xl animate-pulse" />
           </div>
         </div>
-
-        {/* Filter sections */}
-        <div className="mb-6">
-          <div className="h-6 w-16 bg-gray-200 rounded animate-pulse mb-3"></div>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
-            <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
-          </div>
-        </div>
-
-        <div className="mb-6">
-          <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-3"></div>
-          {Array(4)
+        {/* Tabs row */}
+        <div className="flex gap-2">
+          {Array(3)
             .fill(0)
             .map((_, idx) => (
-              <div key={idx} className="flex items-center gap-2 mb-2">
-                <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-5 w-5 ml-auto bg-gray-200 rounded-md animate-pulse"></div>
-              </div>
-            ))}
-        </div>
-
-        <div className="mb-6">
-          <div className="h-6 w-24 bg-gray-200 rounded animate-pulse mb-3"></div>
-          <div className="flex flex-wrap gap-2">
-            {Array(6)
-              .fill(0)
-              .map((_, idx) => (
-                <div
-                  key={idx}
-                  className="h-7 w-20 bg-gray-200 rounded-full animate-pulse"
-                ></div>
-              ))}
-          </div>
-        </div>
-
-        {/* Checkbox filters like in the image */}
-        <div className="mb-6">
-          <div className="h-6 w-24 bg-gray-200 rounded animate-pulse mb-3"></div>
-          {Array(4)
-            .fill(0)
-            .map((_, idx) => (
-              <div key={idx} className="flex items-center gap-2 mb-2">
-                <div className="h-4 w-4 border border-gray-300 rounded animate-pulse"></div>
-                <div className="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
-              </div>
-            ))}
-        </div>
-
-        {/* Tags section */}
-        <div className="mb-6">
-          <div className="h-6 w-16 bg-gray-200 rounded animate-pulse mb-3"></div>
-          <div className="flex flex-wrap gap-2">
-            {Array(5)
-              .fill(0)
-              .map((_, idx) => (
-                <div
-                  key={idx}
-                  className="h-7 px-3 bg-gray-200 rounded-full animate-pulse"
-                ></div>
-              ))}
-          </div>
-        </div>
-
-        {/* Category filters */}
-        <div className="mb-6">
-          <div className="h-6 w-24 bg-gray-200 rounded animate-pulse mb-3"></div>
-          {Array(5)
-            .fill(0)
-            .map((_, idx) => (
-              <div key={idx} className="flex items-center gap-2 mb-2">
-                <div className="h-4 w-4 border border-gray-300 rounded animate-pulse"></div>
-                <div className="h-4 w-20 bg-gray-200 rounded animate-pulse"></div>
-              </div>
+              <div
+                key={idx}
+                className="h-8 w-32 bg-muted/40 rounded-md animate-pulse"
+              />
             ))}
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="flex-1">
-        <>
-          <div className="flex justify-between items-center mb-6">
-            <div className="h-8 w-48 bg-gray-200 rounded-md animate-pulse"></div>
-            <div className="flex gap-2">
-              <div className="h-10 w-10 bg-gray-200 rounded-md animate-pulse"></div>
-              <div className="h-10 w-10 bg-gray-200 rounded-md animate-pulse"></div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {Array(8)
-              .fill(0)
-              .map((_, index) => (
-                <div
-                  key={index}
-                  className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm"
-                >
-                  {/* Discount badge */}
-                  <div className="relative">
-                    <div className="absolute top-2 right-2">
-                      <div className="h-6 w-16 bg-pink-200 rounded-md animate-pulse"></div>
-                    </div>
-
-                    {/* Product image */}
-                    <div className="h-48 w-full bg-gray-200 animate-pulse"></div>
-                  </div>
-
-                  {/* Product info */}
-                  <div className="p-4 space-y-3">
-                    {/* Title */}
-                    <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
-                    <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse"></div>
-
-                    {/* Category */}
-                    <div className="flex items-center gap-2">
-                      <div className="text-sm text-gray-500">Loại:</div>
-                      <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
-                    </div>
-
-                    {/* Description */}
-                    <div className="flex items-center gap-2">
-                      <div className="text-sm text-gray-500">Gói:</div>
-                      <div className="h-4 w-40 bg-gray-200 rounded animate-pulse"></div>
-                    </div>
-
-                    {/* Weight */}
-                    <div className="flex items-center gap-2">
-                      <div className="text-sm text-gray-500">Trọng lượng:</div>
-                      <div className="h-4 w-10 bg-gray-200 rounded animate-pulse"></div>
-                    </div>
-
-                    {/* Short description */}
-                    <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
-
-                    {/* Price and add to cart */}
-                    <div className="flex justify-between items-center pt-2">
-                      <div className="h-6 w-24 bg-gray-200 rounded animate-pulse"></div>
-                      <div className="h-10 w-10 bg-green-100 rounded-md animate-pulse"></div>
-                    </div>
-                  </div>
+      {/* Product grid skeleton */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
+        {Array(10)
+          .fill(0)
+          .map((_, index) => (
+            <div
+              key={index}
+              className="bg-card border border-border/40 rounded-xl overflow-hidden"
+            >
+              {/* Product image */}
+              <div className="relative">
+                <div className="absolute top-2 right-2">
+                  <div className="h-6 w-16 bg-muted/60 rounded-md animate-pulse" />
                 </div>
-              ))}
-          </div>
-        </>
-        {/* <div className="text-center py-10"> */}
-        <AnimatedLoadingSkeleton className="min-w-full" />
-        {/* </div> */}
+                <div className="h-48 w-full bg-muted/60 animate-pulse" />
+              </div>
+
+              {/* Product info */}
+              <div className="p-4 space-y-3">
+                {/* Title */}
+                <div className="h-4 w-full bg-muted/60 rounded animate-pulse" />
+                <div className="h-4 w-3/4 bg-muted/60 rounded animate-pulse" />
+
+                {/* Category */}
+                <div className="flex items-center gap-2">
+                  <div className="text-sm text-muted-foreground">Loại:</div>
+                  <div className="h-4 w-24 bg-muted/60 rounded animate-pulse" />
+                </div>
+
+                {/* Weight */}
+                <div className="flex items-center gap-2">
+                  <div className="text-sm text-muted-foreground">
+                    Trọng lượng:
+                  </div>
+                  <div className="h-4 w-10 bg-muted/60 rounded animate-pulse" />
+                </div>
+
+                {/* Price and add to cart */}
+                <div className="flex justify-between items-center pt-2">
+                  <div className="h-6 w-24 bg-muted/60 rounded animate-pulse" />
+                  <div className="h-10 w-10 bg-primary/10 rounded-md animate-pulse" />
+                </div>
+              </div>
+            </div>
+          ))}
       </div>
+      <AnimatedLoadingSkeleton className="min-w-full" />
     </div>
   );
 }
+
+// Keep default export for backward compatibility
+export default ProductGridSkeleton;

@@ -12,26 +12,26 @@ body {
 
 @layer base {
   :root {
-    /* Mira Style - Optimized for ThaiFruitz (Organic Dried Fruit Brand) */
-    --background: 40 100% 97.5%; /* Warm cream #FFFAF3 - natural, appetizing */
-    --foreground: 0 0% 0%;
-    --card: 0 0% 99.2%;
-    --card-foreground: 0 0% 0%;
-    --popover: 0 0% 98.8%;
-    --popover-foreground: 0 0% 0%;
+    /* Mira Style - Optimized for ThaiFruitz (Modern, Clean, Premium) */
+    --background: 0 0% 98%; /* Soft neutral gray #FAFAFA - modern, clean */
+    --foreground: 0 0% 5%;
+    --card: 0 0% 100%; /* Pure white cards for better contrast */
+    --card-foreground: 0 0% 5%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 5%;
     --primary: 262 100% 59.4%; /* Purple #7033ff */
     --primary-foreground: 0 0% 100%;
-    --secondary: 216 25% 94.3%;
-    --secondary-foreground: 0 0% 3.1%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 32.2%;
+    --secondary: 220 14% 96%; /* Subtle cool gray */
+    --secondary-foreground: 0 0% 10%;
+    --muted: 220 13% 95%; /* Cool-toned muted */
+    --muted-foreground: 0 0% 40%;
     --accent: 224 100% 94.5%; /* Light blue accent */
     --accent-foreground: 215 77% 49%;
     --destructive: 357 75% 60.4%;
     --destructive-foreground: 0 0% 100%;
-    --border: 249 13% 92.4%;
-    --input: 0 0% 92.2%;
-    --ring: 0 0% 0%;
+    --border: 220 13% 91%; /* Subtle cool border */
+    --input: 220 13% 91%;
+    --ring: 262 100% 59.4%; /* Primary color ring */
     --radius: 1.4rem;
 
     /* Charts - Vibrant fruit colors */
@@ -42,36 +42,36 @@ body {
     --chart-5: 0 0% 45.5%; /* Gray */
 
     /* Sidebar */
-    --sidebar-background: 210 33% 97.5%;
-    --sidebar-foreground: 0 0% 0%;
-    --sidebar-primary: 0 0% 0%;
+    --sidebar-background: 0 0% 100%; /* Clean white sidebar */
+    --sidebar-foreground: 0 0% 5%;
+    --sidebar-primary: 262 100% 59.4%; /* Primary purple */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 92.2%;
-    --sidebar-accent-foreground: 0 0% 0%;
-    --sidebar-border: 0 0% 92.2%;
-    --sidebar-ring: 0 0% 0%;
+    --sidebar-accent: 220 13% 95%;
+    --sidebar-accent-foreground: 0 0% 5%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 262 100% 59.4%;
   }
 
   .dark {
-    /* Dark Mode - Sophisticated with warm undertones */
-    --background: 225 7.7% 10.6%; /* #1a1b1e */
-    --foreground: 0 0% 94.1%;
-    --card: 220 5.9% 13.7%;
-    --card-foreground: 0 0% 94.1%;
-    --popover: 220 5.9% 13.7%;
-    --popover-foreground: 0 0% 94.1%;
-    --primary: 262 100% 68%;
+    /* Dark Mode - Modern, Deep, Premium */
+    --background: 240 10% 4%; /* Deep rich black #0A0A0B */
+    --foreground: 0 0% 98%;
+    --card: 240 8% 8%; /* Elevated surface */
+    --card-foreground: 0 0% 98%;
+    --popover: 240 8% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 262 100% 68%; /* Brighter purple for dark mode */
     --primary-foreground: 0 0% 100%;
-    --secondary: 225 10% 17.1%;
-    --secondary-foreground: 0 0% 94.1%;
-    --muted: 225 10% 17.1%;
-    --muted-foreground: 0 0% 62.7%;
-    --accent: 215 25% 16.9%;
-    --accent-foreground: 213 100% 74.1%;
+    --secondary: 240 6% 12%; /* Subtle elevation */
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 6% 12%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 240 6% 15%;
+    --accent-foreground: 262 100% 75%;
     --destructive: 0 70% 70.6%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 6.5% 21.2%;
-    --input: 220 6.5% 21.2%;
+    --border: 240 6% 18%; /* Refined border */
+    --input: 240 6% 18%;
     --ring: 262 100% 68%;
 
     /* Charts - Dark mode vibrant */
@@ -82,13 +82,13 @@ body {
     --chart-5: 0 0% 62.7%;
 
     /* Sidebar - Dark */
-    --sidebar-background: 228 9.1% 8.6%;
-    --sidebar-foreground: 0 0% 94.1%;
+    --sidebar-background: 240 10% 3%; /* Deeper sidebar */
+    --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 262 100% 68%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 225 10% 17.1%;
-    --sidebar-accent-foreground: 262 100% 68%;
-    --sidebar-border: 220 6.5% 21.2%;
+    --sidebar-accent: 240 6% 12%;
+    --sidebar-accent-foreground: 262 100% 75%;
+    --sidebar-border: 240 6% 18%;
     --sidebar-ring: 262 100% 68%;
   }
 }

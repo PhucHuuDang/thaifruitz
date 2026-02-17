@@ -31,7 +31,15 @@ import {
 import { SelectValue } from "@radix-ui/react-select";
 import axios from "axios";
 import Cookie from "js-cookie";
-import { Search, ShoppingBag } from "lucide-react";
+import {
+  Search,
+  ShoppingBag,
+  Sparkles,
+  Filter,
+  X,
+  Tag,
+  Check,
+} from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -44,6 +52,12 @@ import {
 } from "@/components/global-components/card/custom-combo/combo-discount-info";
 import { formatVND } from "@/lib/format-currency";
 import { useData } from "@/providers/data-provider";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 export type ComboItem = {
   id: string; // Using productVariantId as id
@@ -76,6 +90,7 @@ export const CustomComboBuilder = memo(
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [activeCategory, setActiveCategory] = useState<string>("all");
     const [activeTags, setActiveTags] = useState<string[]>([]);
+    const [tagSearchTerm, setTagSearchTerm] = useState<string>("");
 
     const [activeItem, setActiveItem] = useState<ComboItem | null>(null);
 
@@ -93,8 +108,8 @@ export const CustomComboBuilder = memo(
           productsData
             .flatMap((product) => product.categories)
             .filter(Boolean)
-            .map((category) => JSON.stringify(category))
-        )
+            .map((category) => JSON.stringify(category)),
+        ),
       ).map((categoryString) => JSON.parse(categoryString)),
     ];
 
@@ -104,9 +119,16 @@ export const CustomComboBuilder = memo(
         productsData
           .flatMap((product: Product) => product.tags)
           .filter(Boolean)
-          .map((tag: string | undefined) => tag?.trim())
-      )
+          .map((tag: string | undefined) => tag?.trim()),
+      ),
     ).sort();
+
+    // Filter tags based on search term
+    const filteredTags = tagSearchTerm
+      ? allTags.filter((tag) =>
+          tag?.toLowerCase().includes(tagSearchTerm.toLowerCase()),
+        )
+      : allTags;
 
     useEffect(() => {
       // Initialize products from the data
@@ -120,7 +142,7 @@ export const CustomComboBuilder = memo(
         searchTerm === "" ||
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product?.tags?.some((tag) =>
-          tag.toLowerCase().includes(searchTerm.toLowerCase())
+          tag.toLowerCase().includes(searchTerm.toLowerCase()),
         );
 
       // Filter by category
@@ -134,8 +156,8 @@ export const CustomComboBuilder = memo(
         activeTags.every((tag) =>
           product?.tags?.some(
             (productTag) =>
-              productTag.trim().toLowerCase() === tag.toLowerCase()
-          )
+              productTag.trim().toLowerCase() === tag.toLowerCase(),
+          ),
         );
 
       return matchesSearch && matchesCategory && matchesTags;
@@ -143,7 +165,7 @@ export const CustomComboBuilder = memo(
 
     const toggleTag = (tag: string) => {
       setActiveTags((prev) =>
-        prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+        prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
       );
     };
 
@@ -155,7 +177,7 @@ export const CustomComboBuilder = memo(
 
     const addToCombo = (product: Product, variant: ProductVariant) => {
       const existingItemIndex = selectedItems.findIndex(
-        (item) => item.productVariantId === variant.productVariantId
+        (item) => item.productVariantId === variant.productVariantId,
       );
 
       if (existingItemIndex >= 0) {
@@ -178,7 +200,7 @@ export const CustomComboBuilder = memo(
       }
 
       toast.success(
-        `Đã thêm ${product.name} - ${variant.packageType} vào combo`
+        `Đã thêm ${product.name} - ${variant.packageType} vào combo`,
       );
     };
 
@@ -187,8 +209,8 @@ export const CustomComboBuilder = memo(
         // Remove item if quantity is 0 or negative
         setSelectedItems(
           selectedItems.filter(
-            (item) => item.productVariantId !== productVariantId
-          )
+            (item) => item.productVariantId !== productVariantId,
+          ),
         );
       } else {
         // Update quantity
@@ -196,8 +218,8 @@ export const CustomComboBuilder = memo(
           selectedItems.map((item) =>
             item.productVariantId === productVariantId
               ? { ...item, quantity }
-              : item
-          )
+              : item,
+          ),
         );
       }
     };
@@ -205,8 +227,8 @@ export const CustomComboBuilder = memo(
     const removeItem = (productVariantId: string) => {
       setSelectedItems(
         selectedItems.filter(
-          (item) => item.productVariantId !== productVariantId
-        )
+          (item) => item.productVariantId !== productVariantId,
+        ),
       );
     };
 
@@ -237,7 +259,7 @@ export const CustomComboBuilder = memo(
 
       const totalItems = selectedItems.reduce(
         (count, item) => count + item.quantity,
-        0
+        0,
       );
       const discountPercentage = calculateComboDiscount(totalItems);
       const discountAmount = (subtotal * discountPercentage) / 100;
@@ -288,7 +310,7 @@ export const CustomComboBuilder = memo(
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
-          }
+          },
         );
 
         // console.log(response);
@@ -320,7 +342,7 @@ export const CustomComboBuilder = memo(
 
       const product = products.find((p) => p.id === productId);
       const variant = product?.variant.find(
-        (v) => v.productVariantId === variantId
+        (v) => v.productVariantId === variantId,
       );
 
       if (product && variant) {
@@ -354,7 +376,7 @@ export const CustomComboBuilder = memo(
       if (over && over.id === "combo-drop-zone" && activeItem) {
         // Check if item already exists in combo
         const existingItemIndex = selectedItems.findIndex(
-          (item) => item.productVariantId === activeItem.productVariantId
+          (item) => item.productVariantId === activeItem.productVariantId,
         );
 
         if (existingItemIndex >= 0) {
@@ -387,28 +409,35 @@ export const CustomComboBuilder = memo(
         collisionDetection={closestCenter}
         modifiers={[restrictToWindowEdges]}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 motion-preset-pop">
-          <div className="lg:col-span-8">
-            <div className="bg-white rounded-3xl border border-[oklch(0.929 0.013 255.508)] shadow-sm p-6 mb-6">
-              <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Product Grid Section */}
+          <div className="lg:col-span-8 space-y-6">
+            {/* Filter Section - Modern Glassmorphism Card */}
+            <div className="bg-card/50 backdrop-blur-sm rounded-2xl border border-border/50 shadow-sm p-8">
+              {/* Search and Category Filter */}
+              <div className="flex flex-col md:flex-row gap-4 mb-8">
                 <div className="flex-1">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-700" />
+                    <Search
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground"
+                      size={20}
+                    />
                     <Input
                       placeholder="Tìm kiếm sản phẩm..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 border-slate-200 focus-visible:ring-slate-400"
+                      className="pl-12 h-12 border-border/60 focus-visible:ring-primary/20 bg-background/50 backdrop-blur-sm"
                     />
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Select
                     onValueChange={(setValue) => setActiveCategory(setValue)}
                     value={activeCategory}
                     defaultValue="all"
                   >
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-[200px] h-12 border-border/60 bg-background/50 backdrop-blur-sm">
+                      <Filter className="mr-2" size={18} />
                       <SelectValue placeholder="Lọc theo loại" />
                     </SelectTrigger>
 
@@ -430,113 +459,243 @@ export const CustomComboBuilder = memo(
                 </div>
               </div>
 
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-2">
-                  {activeTags.length > 0 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={clearFilters}
-                      className="ml-auto text-xs text-slate-700 hover:text-slate-700"
-                    >
-                      Xóa bộ lọc
-                    </Button>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap gap-2 mt-2">
-                  <CuisineSelector
-                    title="Lọc theo thẻ"
-                    options={allTags as string[]}
-                    activeOptions={activeTags.length ? activeTags : []}
-                    toggleCuisine={toggleTag}
-                  />
-                </div>
-              </div>
-
-              <AnimatePresence>
-                {filteredProducts.length > 0 ? (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 "
-                  >
-                    {filteredProducts.map((product) => {
-                      // console.log({ product });
-
-                      return (
-                        <motion.div
-                          key={product.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -20 }}
-                          transition={{ duration: 0.3 }}
+              {/* Tag Filter Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <Tag size={16} className="text-muted-foreground" />
+                    Lọc theo thẻ
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    {activeTags.length > 0 && (
+                      <span className="text-xs text-muted-foreground">
+                        {activeTags.length} đã chọn
+                      </span>
+                    )}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 border-border/60 hover:bg-muted/50"
                         >
-                          <ProductCard
-                            product={product}
-                            onAddToCombo={addToCombo}
-                          />
-                        </motion.div>
-                      );
-                    })}
-                  </motion.div>
-                ) : (
+                          <Filter size={14} className="mr-1.5" />
+                          {activeTags.length > 0 ? "Chỉnh sửa" : "Chọn thẻ"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80 p-0" align="end">
+                        <div className="flex flex-col max-h-[400px]">
+                          {/* Search Header */}
+                          <div className="p-3 border-b border-border/50">
+                            <div className="relative">
+                              <Search
+                                className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                                size={16}
+                              />
+                              <Input
+                                placeholder="Tìm kiếm thẻ..."
+                                value={tagSearchTerm}
+                                onChange={(e) =>
+                                  setTagSearchTerm(e.target.value)
+                                }
+                                className="pl-9 h-9 text-sm"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Tag List */}
+                          <ScrollArea className="flex-1 max-h-[300px]">
+                            <div className="p-2 space-y-1">
+                              {filteredTags.length > 0 ? (
+                                filteredTags
+                                  .filter(
+                                    (tag): tag is string => tag !== undefined,
+                                  )
+                                  .map((tag) => {
+                                    const isSelected = activeTags.includes(tag);
+                                    return (
+                                      <motion.button
+                                        key={tag}
+                                        type="button"
+                                        onClick={() => toggleTag(tag)}
+                                        className={cn(
+                                          "w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors",
+                                          isSelected
+                                            ? "bg-primary/10 text-primary font-medium"
+                                            : "hover:bg-muted/50 text-foreground",
+                                        )}
+                                        whileHover={{ scale: 1.01 }}
+                                        whileTap={{ scale: 0.98 }}
+                                      >
+                                        <span className="truncate">{tag}</span>
+                                        {isSelected && (
+                                          <Check
+                                            size={16}
+                                            className="ml-2 flex-shrink-0"
+                                          />
+                                        )}
+                                      </motion.button>
+                                    );
+                                  })
+                              ) : (
+                                <div className="text-center py-8 text-sm text-muted-foreground">
+                                  Không tìm thấy thẻ nào
+                                </div>
+                              )}
+                            </div>
+                          </ScrollArea>
+
+                          {/* Footer */}
+                          {activeTags.length > 0 && (
+                            <div className="p-2 border-t border-border/50">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={clearFilters}
+                                className="w-full text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                              >
+                                <X size={14} className="mr-1.5" />
+                                Xóa tất cả ({activeTags.length})
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </div>
+
+                {/* Selected Tags Display */}
+                {activeTags.length > 0 && (
                   <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="text-center py-16 text-slate-500 bg-slate-50 rounded-lg"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="flex flex-wrap gap-2"
                   >
-                    <div className="flex flex-col items-center">
-                      <Search className="w-12 h-12 text-slate-300 mb-4" />
-                      <p className="text-lg font-medium mb-2">
-                        Không tìm thấy sản phẩm phù hợp
-                      </p>
-                      <p className="text-sm text-slate-400 mb-4">
-                        Hãy thử tìm kiếm với từ khóa khác hoặc điều chỉnh bộ lọc
-                      </p>
-                      <Button
-                        variant="outline"
-                        onClick={clearFilters}
-                        className="border-slate-300"
+                    {activeTags.map((tag) => (
+                      <motion.div
+                        key={tag}
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0.8, opacity: 0 }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20"
                       >
-                        Xóa bộ lọc
-                      </Button>
-                    </div>
+                        <span>{tag}</span>
+                        <button
+                          type="button"
+                          onClick={() => toggleTag(tag)}
+                          className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+                        >
+                          <X size={14} />
+                        </button>
+                      </motion.div>
+                    ))}
                   </motion.div>
                 )}
-              </AnimatePresence>
+              </div>
             </div>
+
+            {/* Product Grid */}
+            <AnimatePresence mode="wait">
+              {filteredProducts.length > 0 ? (
+                <motion.div
+                  key="products"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                  {filteredProducts.map((product) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <ProductCard
+                        product={product}
+                        onAddToCombo={addToCombo}
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="empty"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="text-center py-20 bg-muted/30 rounded-2xl border border-border/50"
+                >
+                  <div className="flex flex-col items-center max-w-md mx-auto">
+                    <div className="w-20 h-20 rounded-full bg-muted/50 flex items-center justify-center mb-6">
+                      <Search className="w-10 h-10 text-muted-foreground/50" />
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground mb-2">
+                      Không tìm thấy sản phẩm phù hợp
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-6 text-center">
+                      Hãy thử tìm kiếm với từ khóa khác hoặc điều chỉnh bộ lọc
+                      của bạn
+                    </p>
+                    <Button
+                      variant="outline"
+                      onClick={clearFilters}
+                      className="border-border/60"
+                    >
+                      <X size={16} className="mr-2" />
+                      Xóa tất cả bộ lọc
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
+          {/* Combo Sidebar */}
           <div className="lg:col-span-4 h-full">
             <ComboDropZone>
-              <div className="rounded-xl shadow-sm p-6 sticky top-4 cardStyle">
-                <div className="flex items-center gap-2 mb-2">
-                  <ShoppingBag className="text-slate-900" size={20} />
-                  <h2 className="text-xl font-semibold text-slate-900">
-                    Combo của bạn
-                  </h2>
+              <div className="rounded-2xl shadow-lg p-8 sticky top-[180px] bg-card/50 backdrop-blur-md border border-border/50">
+                {/* Header */}
+                <div className="flex md:flex-col items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <ShoppingBag className="text-primary" size={20} />
+                    </div>
+                    <h2 className="text-2xl font-bold text-foreground">
+                      Combo của bạn
+                    </h2>
+                  </div>
 
                   {selectedItems.length > 0 && (
                     <ComboDiscountBadge
                       totalItems={selectedItems.reduce(
                         (count, item) => count + item.quantity,
-                        0
+                        0,
                       )}
                       value={parsedValue}
                     />
                   )}
                 </div>
-                <h3 className="text-sm text-slate-700 font-semibold mb-2">
-                  Tạo Combo cần tối thiểu 5 sản phẩm
-                </h3>
 
-                <div className="mb-6">
+                {/* Info Badge */}
+                <div className="bg-muted/50 backdrop-blur-sm rounded-xl p-4 mb-6 border border-border/30">
+                  <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    Tạo Combo cần tối thiểu{" "}
+                    <span className="font-bold text-foreground">
+                      5 sản phẩm
+                    </span>
+                  </p>
+                </div>
+
+                {/* Combo Name Input */}
+                <div className="mb-6 space-y-2">
                   <Label
                     htmlFor="combo-name"
-                    className="text-slate-700 mb-1.5 block"
+                    className="text-sm font-semibold text-foreground"
                   >
                     Tên combo
                   </Label>
@@ -545,23 +704,26 @@ export const CustomComboBuilder = memo(
                     placeholder="Nhập tên cho combo của bạn"
                     value={comboName}
                     onChange={(e) => setComboName(e.target.value)}
-                    className="border-slate-200 focus-visible:ring-slate-400"
+                    className="h-11 border-border/60 focus-visible:ring-primary/20 bg-background/50 backdrop-blur-sm"
                   />
                 </div>
 
-                <ComboDiscountInfo className="mb-4" value={parsedValue} />
+                {/* Discount Info */}
+                <ComboDiscountInfo className="mb-6" value={parsedValue} />
 
-                <Separator className="my-6 bg-slate-100" />
+                <Separator className="my-6 bg-border/50" />
 
+                {/* Selected Items List */}
                 <DndContext onDragEnd={handleComboReorder}>
-                  <AnimatePresence>
+                  <AnimatePresence mode="wait">
                     {selectedItems.length > 0 ? (
                       <motion.div
+                        key="items"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                       >
-                        <ScrollArea className="h-[400px] pr-4">
+                        <ScrollArea className="h-[400px] pr-2">
                           <SelectedItems
                             items={selectedItems}
                             onUpdateQuantity={updateItemQuantity}
@@ -571,16 +733,19 @@ export const CustomComboBuilder = memo(
                       </motion.div>
                     ) : (
                       <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="text-center py-12 text-slate-400 bg-slate-50 rounded-lg"
+                        key="empty"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="text-center py-16 bg-muted/30 rounded-xl border border-border/30"
                       >
-                        <ShoppingBag className="w-12 h-12 mx-auto mb-4 text-slate-300" />
-                        <p className="text-slate-500 font-medium">
-                          Chưa có sản phẩm nào được chọn
-                        </p>
-                        <p className="text-sm text-slate-400 mt-1">
+                        <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                          <ShoppingBag className="w-8 h-8 text-muted-foreground/50" />
+                        </div>
+                        <h3 className="text-base font-semibold text-foreground mb-1">
+                          Chưa có sản phẩm nào
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
                           Hãy thêm sản phẩm vào combo của bạn
                         </p>
                       </motion.div>
@@ -588,45 +753,50 @@ export const CustomComboBuilder = memo(
                   </AnimatePresence>
                 </DndContext>
 
+                {/* Price Summary */}
                 {selectedItems.length > 0 && (
                   <>
-                    <Separator className="my-4 bg-slate-100" />
-                    <div className="space-y-2 mb-4">
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-slate-600 font-bold">
+                    <Separator className="my-6 bg-border/50" />
+                    <div className="space-y-3 mb-6">
+                      {/* Subtotal */}
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted-foreground font-medium">
                           Tạm tính:
                         </span>
-                        <span className="text-sky-500 text-lg font-bold">
+                        <span className="text-lg font-bold text-primary">
                           {formatVND(calculateTotalPrice().subtotal)}
                         </span>
                       </div>
 
+                      {/* Discount */}
                       {calculateTotalPrice().discountPercentage > 0 && (
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-rose-400 flex items-center gap-1">
+                        <div className="flex justify-between items-center bg-destructive/5 rounded-lg p-3 border border-destructive/10">
+                          <span className="text-sm text-destructive flex items-center gap-2">
+                            <Sparkles className="w-4 h-4" />
                             <span>
-                              Giảm giá combo (
-                              {calculateTotalPrice().discountPercentage}%):
+                              Giảm giá (
+                              {calculateTotalPrice().discountPercentage}%)
                             </span>
-                            <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-1 text-xs text-green-700">
+                            <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                               {selectedItems.reduce(
                                 (count, item) => count + item.quantity,
-                                0
+                                0,
                               )}{" "}
-                              sản phẩm
+                              SP
                             </span>
                           </span>
-                          <span className="text-rose-500 font-semibold text-base">
+                          <span className="text-base font-bold text-destructive">
                             -{formatVND(calculateTotalPrice().discountAmount)}
                           </span>
                         </div>
                       )}
 
-                      <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                        <span className="font-semibold text-slate-700">
+                      {/* Total */}
+                      <div className="flex justify-between items-center pt-3 border-t border-border/50">
+                        <span className="text-base font-bold text-foreground">
                           Tổng tiền:
                         </span>
-                        <span className="text-2xl font-bold text-sky-500">
+                        <span className="text-3xl font-bold text-primary">
                           {formatVND(calculateTotalPrice().total)}
                         </span>
                       </div>
@@ -634,14 +804,9 @@ export const CustomComboBuilder = memo(
                   </>
                 )}
 
+                {/* Create Combo Button */}
                 <Button
-                  className={`w-full bg-sky-500 hover:bg-sky-700 text-white transition duration-200 hoverAnimate ${
-                    selectedItems.length === 0 ||
-                    selectedItems.length < 4 ||
-                    comboName.trim() === ""
-                      ? "cursor-not-allowed"
-                      : "cursor-pointer"
-                  }`}
+                  className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleSubmit}
                   disabled={
                     selectedItems.length === 0 ||
@@ -649,7 +814,8 @@ export const CustomComboBuilder = memo(
                     comboName.trim() === ""
                   }
                 >
-                  Tạo combo
+                  <Sparkles size={18} className="mr-2" />
+                  Tạo combo ngay
                 </Button>
               </div>
             </ComboDropZone>
@@ -682,7 +848,7 @@ export const CustomComboBuilder = memo(
                     {formatVND(
                       activeItem.variant.promotion
                         ? activeItem.variant.promotion.price
-                        : activeItem.variant.price
+                        : activeItem.variant.price,
                     )}
                   </p>
                 </div>
@@ -693,7 +859,7 @@ export const CustomComboBuilder = memo(
         {/* <Toaster /> */}
       </DndContext>
     );
-  }
+  },
 );
 
 CustomComboBuilder.displayName = "CustomComboBuilder";

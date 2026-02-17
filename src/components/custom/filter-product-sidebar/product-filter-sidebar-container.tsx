@@ -1,7 +1,7 @@
 "use client";
 
 import { useFetch } from "@/actions/tanstack/use-tanstack-actions";
-import ProductSkeletonWithSidebar from "@/components/global-components/custom-skeleton/side-bar-skeleton";
+import { ProductGridSkeleton } from "@/components/global-components/custom-skeleton/side-bar-skeleton";
 import { EmptyState } from "@/components/global-components/empty-state";
 import { Product } from "@/hooks/use-cart-store";
 import { ApiResponse, PageResult } from "@/types/types";
@@ -25,7 +25,7 @@ export const ProductFilterSidebarContainer = () => {
   ]);
 
   if (isLoading || isComboLoading) {
-    return <ProductSkeletonWithSidebar />;
+    return <ProductGridSkeleton />;
   }
 
   if (products?.value?.items.length === 0) {

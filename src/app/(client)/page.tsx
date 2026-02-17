@@ -189,7 +189,7 @@ const ClientPage = async () => {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
-      <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex flex-col h-full ">
         {/* Hero Section - Optimized height */}
         <ImagesSlider images={images} className="h-[60vh] lg:h-[70vh]">
           <BannerText />

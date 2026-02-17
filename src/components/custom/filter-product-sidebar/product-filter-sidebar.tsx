@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
-  ChevronRight,
   Grid3X3,
   Search,
   SlidersHorizontal,
@@ -16,6 +15,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 import {
   Select,
@@ -24,11 +24,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import {
-  Sidebar,
-  SidebarInset,
-  SidebarProvider,
-} from "@/components/ui/sidebar";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 import { Product } from "@/hooks/use-cart-store";
 import { memo, startTransition, useCallback, useMemo, useState } from "react";
@@ -36,7 +39,6 @@ import {
   CardProduct,
   CardProductProps,
 } from "@/components/global-components/card/card-product";
-import FilterSidebar from "./filter-sidebar";
 import { toLowerCaseNonAccentVietnamese } from "@/utils/non-accent";
 import { AdvancedColorfulBadges } from "@/components/global-components/badge/advanced-badge";
 import ComboProductCard, {
@@ -45,6 +47,7 @@ import ComboProductCard, {
 import { EmptyState } from "@/components/global-components/empty-state";
 import { CustomComboBuilder } from "@/features/client/home/custom-combo/custom-combo-builder";
 import { VercelTab } from "../_custom_tabs/vercel-tabs";
+import FilterPanel from "./filter-panel";
 
 // ─── Constants ──────────────────────────────────────────────────────────
 const TABS: { id: string; label: string; icon: LucideIcon }[] = [
@@ -191,7 +194,6 @@ export const ProductFilterSidebar = memo(
     });
 
     const [sortBy, setSortBy] = useState("popular");
-    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
     const [wishlist, setWishlist] = useState<string[]>([]);
     const [compareList, setCompareList] = useState<string[]>([]);
     const [recentlyViewed, setRecentlyViewed] = useState<CardProductProps[]>(
@@ -211,6 +213,7 @@ export const ProductFilterSidebar = memo(
     ]);
     const [searchQuery, setSearchQuery] = useState("");
     const [tab, setTab] = useState("tab-1");
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     // ─── Derived state via useMemo (replaces 3 useEffect hooks) ───────
 
@@ -567,102 +570,28 @@ export const ProductFilterSidebar = memo(
     // ─── Render ───────────────────────────────────────────────────────
 
     return (
-      <SidebarProvider className="p-2 sm:p-4 has-[[data-variant=inset]]:bg-gradient-to-b from-amber-50/80 to-white rounded-2xl sm:rounded-3xl">
-        <Sidebar
-          className="hidden md:flex h-[calc(100vh-2rem)] sticky top-4 overflow-hidden"
-          variant="inset"
-        >
-          <FilterSidebar
-            searchQuery={searchQuery}
-            handleSearchChange={handleSearchChange}
-            activeFiltersCount={activeFiltersCount}
-            resetFilters={resetFilters}
-            saveCurrentFilter={saveCurrentFilter}
-            applySavedFilter={applySavedFilter}
-            savedFilters={savedFilters}
-            popularFilters={popularFilters}
-            handleTagChange={handleTagChange}
-            handleCategoryChange={handleCategoryChange}
-            handlePackageTypeChange={handlePackageTypeChange}
-            handlePriceRangeChange={handlePriceRangeChange}
-            weightRange={weightRange}
-            handleWeightRangeChange={handleWeightRangeChange}
-            handlePromotionChange={handlePromotionChange}
-            handleInStockChange={handleInStockChange}
-            handleNutritionRangeChange={handleNutritionRangeChange}
-            toggleCompare={toggleCompare}
-            compareList={compareList}
-            recentlyViewed={recentlyViewed}
-            products={products}
-            filters={filters}
-            tags={tags}
-            priceRange={priceRange}
-            packageTypes={packageTypes}
-            categories={categories}
-            filteredProducts={filteredProducts}
-          />
-        </Sidebar>
+      <div className="w-full space-y-4 ">
+        {/* ─── Sticky Toolbar ──────────────────────────────────────── */}
+        <div className="sticky top-[70px] z-20 backdrop-blur-xl bg-background/80 border border-border/40 rounded-2xl shadow-sm">
+          <div className="px-4 py-3 space-y-3">
+            {/* Row 1: Search + Sort + Filter Button */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              {/* Search */}
+              <div className="relative flex-1 group">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-200" />
+                <Input
+                  placeholder="Tìm kiếm sản phẩm..."
+                  className="pl-9 h-10 rounded-xl border-border/60 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all duration-200"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  aria-label="Tìm kiếm sản phẩm"
+                />
+              </div>
 
-        <SidebarInset className="overflow-hidden bg-white/80 backdrop-blur-sm cardStyle rounded-2xl">
-          <div
-            className="space-y-4 sm:space-y-6 w-full cardStyle"
-            role="region"
-            aria-label="Danh sách sản phẩm"
-          >
-            {/* ─── Mobile Filter Button ────────────────────────────── */}
-            <div className="md:hidden sticky top-0 z-10 backdrop-blur-xl bg-white/90 px-3 py-3 border-b border-white/20 shadow-sm">
-              <Button
-                variant="outline"
-                className="w-full flex items-center justify-between border-slate-200 hover:border-amber-300 hover:bg-gradient-to-r hover:from-amber-50 hover:to-yellow-50 transition-all duration-200 h-11 rounded-xl shadow-sm"
-                onClick={() => setIsMobileFilterOpen(true)}
-              >
-                <div className="flex items-center gap-2">
-                  <SlidersHorizontal className="h-4 w-4 text-amber-600" />
-                  <span className="font-medium text-sm text-stone-800">
-                    Bộ lọc
-                  </span>
-                  {activeFiltersCount > 0 && (
-                    <Badge
-                      variant="secondary"
-                      className="h-5 min-w-5 rounded-full text-xs bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-700 border border-amber-200/50"
-                    >
-                      {activeFiltersCount}
-                    </Badge>
-                  )}
-                </div>
-                <ChevronRight className="h-4 w-4 text-slate-400" />
-              </Button>
-            </div>
-
-            {/* ─── Sort & Results Header ───────────────────────────── */}
-            <div className="flex flex-col gap-4 px-3 sm:px-5 pt-3 sm:pt-5">
-              {/* Results count + sort */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <motion.div
-                    className="h-8 w-8 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center shadow-sm"
-                    whileHover={{ rotate: 180 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <Sparkles className="h-4 w-4 text-amber-600" />
-                  </motion.div>
-                  <div>
-                    <h2 className="font-semibold text-stone-800 text-base">
-                      Sản phẩm{" "}
-                      <span className="text-slate-500 font-normal text-sm">
-                        ({filteredProducts.length})
-                      </span>
-                    </h2>
-                    {activeFiltersCount > 0 && (
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Đang áp dụng {activeFiltersCount} bộ lọc
-                      </p>
-                    )}
-                  </div>
-                </div>
-
+              <div className="flex items-center gap-2">
+                {/* Sort */}
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-full sm:w-[200px] h-10 rounded-xl border-slate-200 hover:border-slate-300 transition-colors duration-200">
+                  <SelectTrigger className="w-full sm:w-[180px] h-10 rounded-xl border-border/60 hover:border-border transition-colors duration-200">
                     <SelectValue placeholder="Sắp xếp theo" />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -677,248 +606,339 @@ export const ProductFilterSidebar = memo(
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
 
-              {/* Tabs */}
-              <div className="overflow-x-auto scrollbar-hide -mx-3 px-3">
-                <VercelTab
-                  tabs={TABS}
-                  activeTab={tab}
-                  onTabChange={setTab}
-                  classNameContent="text-slate-800 gap-1 whitespace-nowrap"
-                />
+                {/* Filter Sheet Trigger */}
+                <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+                  <SheetTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="h-10 rounded-xl border-border/60 hover:border-primary/40 hover:bg-primary/5 transition-all duration-200 gap-2 shrink-0"
+                    >
+                      <SlidersHorizontal className="h-4 w-4" />
+                      <span className="hidden sm:inline">Bộ lọc</span>
+                      {activeFiltersCount > 0 && (
+                        <Badge
+                          variant="secondary"
+                          className="h-5 min-w-5 rounded-full text-xs bg-primary/10 text-primary border-0"
+                        >
+                          {activeFiltersCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent
+                    className="w-full sm:w-[520px] p-0 overflow-hidden "
+                    classNameOverlay="bg-black/20"
+                  >
+                    <SheetHeader className="px-5 pt-5 pb-3 border-b border-border/40">
+                      <SheetTitle className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <SlidersHorizontal className="h-4 w-4 text-primary" />
+                          </div>
+                          <span>Bộ lọc nâng cao</span>
+                          {activeFiltersCount > 0 && (
+                            <Badge
+                              variant="secondary"
+                              className="h-5 min-w-5 rounded-full text-xs bg-primary/10 text-primary border-0"
+                            >
+                              {activeFiltersCount}
+                            </Badge>
+                          )}
+                        </div>
+                        {activeFiltersCount > 0 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={resetFilters}
+                            className="h-8 px-2.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200 rounded-lg text-xs"
+                          >
+                            <X className="mr-1 h-3 w-3" />
+                            Xóa tất cả
+                          </Button>
+                        )}
+                      </SheetTitle>
+                    </SheetHeader>
+                    <FilterPanel
+                      searchQuery={searchQuery}
+                      handleSearchChange={handleSearchChange}
+                      activeFiltersCount={activeFiltersCount}
+                      resetFilters={resetFilters}
+                      saveCurrentFilter={saveCurrentFilter}
+                      applySavedFilter={applySavedFilter}
+                      savedFilters={savedFilters}
+                      popularFilters={popularFilters}
+                      handleTagChange={handleTagChange}
+                      handleCategoryChange={handleCategoryChange}
+                      handlePackageTypeChange={handlePackageTypeChange}
+                      handlePriceRangeChange={handlePriceRangeChange}
+                      weightRange={weightRange}
+                      handleWeightRangeChange={handleWeightRangeChange}
+                      handlePromotionChange={handlePromotionChange}
+                      handleInStockChange={handleInStockChange}
+                      handleNutritionRangeChange={handleNutritionRangeChange}
+                      toggleCompare={toggleCompare}
+                      compareList={compareList}
+                      recentlyViewed={recentlyViewed}
+                      products={products}
+                      filters={filters}
+                      tags={tags}
+                      priceRange={priceRange}
+                      packageTypes={packageTypes}
+                      categories={categories}
+                      filteredProducts={filteredProducts}
+                    />
+                  </SheetContent>
+                </Sheet>
               </div>
             </div>
 
-            {/* ─── Active Filter Badges ────────────────────────────── */}
-            <AnimatePresence mode="popLayout">
-              {activeFiltersCount > 0 && (
-                <motion.div
-                  className="flex flex-wrap gap-2 px-3 sm:px-5"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.25, ease: "easeOut" }}
-                >
-                  <AnimatePresence mode="popLayout">
-                    {filters.categories.map((category) =>
-                      renderActiveBadge(`cat-${category}`, category, () =>
-                        handleCategoryChange(category),
-                      ),
-                    )}
+            {/* Row 2: Tabs */}
+            <div className="overflow-x-auto scrollbar-hide -mx-1 px-1">
+              <VercelTab
+                tabs={TABS}
+                activeTab={tab}
+                onTabChange={setTab}
+                classNameContent="text-foreground gap-1 whitespace-nowrap"
+              />
+            </div>
+          </div>
+        </div>
 
-                    {filters.packageTypes.map((packageType) =>
-                      renderActiveBadge(`pkg-${packageType}`, packageType, () =>
-                        handlePackageTypeChange(packageType),
-                      ),
-                    )}
+        {/* ─── Active Filter Badges ────────────────────────────────── */}
+        <AnimatePresence mode="popLayout">
+          {activeFiltersCount > 0 && (
+            <motion.div
+              className="flex flex-wrap items-center gap-2 px-1"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+            >
+              <div className="flex items-center gap-1.5 mr-1">
+                <Sparkles className="h-3.5 w-3.5 text-primary" />
+                <span className="text-xs font-medium text-muted-foreground">
+                  {filteredProducts.length} sản phẩm
+                </span>
+              </div>
 
-                    {filters.tags.map((tag) =>
-                      renderActiveBadge(`tag-${tag}`, tag, () =>
-                        handleTagChange(tag),
-                      ),
-                    )}
+              <AnimatePresence mode="popLayout">
+                {filters.categories.map((category) =>
+                  renderActiveBadge(`cat-${category}`, category, () =>
+                    handleCategoryChange(category),
+                  ),
+                )}
 
-                    {(filters.priceRange?.[0] > priceRange.min ||
-                      filters.priceRange?.[1] < priceRange.max) &&
-                      renderActiveBadge(
-                        "price",
-                        `Giá: ${filters.priceRange[0].toLocaleString()}đ - ${filters.priceRange[1].toLocaleString()}đ`,
-                        () =>
-                          updateFilters((prev) => ({
-                            ...prev,
-                            priceRange: [priceRange.min, priceRange.max],
-                          })),
-                      )}
+                {filters.packageTypes.map((packageType) =>
+                  renderActiveBadge(`pkg-${packageType}`, packageType, () =>
+                    handlePackageTypeChange(packageType),
+                  ),
+                )}
 
-                    {(filters.weightRange?.[0] > weightRange.min ||
-                      filters.weightRange?.[1] < weightRange.max) &&
-                      renderActiveBadge(
-                        "weight",
-                        `Trọng lượng: ${filters.weightRange[0]} - ${filters.weightRange[1]}`,
-                        () =>
-                          updateFilters((prev) => ({
-                            ...prev,
-                            weightRange: [weightRange.min, weightRange.max],
-                          })),
-                      )}
+                {filters.tags.map((tag) =>
+                  renderActiveBadge(`tag-${tag}`, tag, () =>
+                    handleTagChange(tag),
+                  ),
+                )}
 
-                    {(filters.nutritionRange?.calories?.[0] > 0 ||
-                      filters.nutritionRange?.calories?.[1] < 200) &&
-                      renderActiveBadge(
-                        "cal",
-                        `Calories: ${filters.nutritionRange.calories[0]}kcal - ${filters.nutritionRange.calories[1]}kcal`,
-                        () =>
-                          updateFilters((prev) => ({
-                            ...prev,
-                            nutritionRange: {
-                              ...prev.nutritionRange,
-                              calories: [0, 200],
-                            },
-                          })),
-                      )}
+                {(filters.priceRange?.[0] > priceRange.min ||
+                  filters.priceRange?.[1] < priceRange.max) &&
+                  renderActiveBadge(
+                    "price",
+                    `Giá: ${filters.priceRange[0].toLocaleString()}đ - ${filters.priceRange[1].toLocaleString()}đ`,
+                    () =>
+                      updateFilters((prev) => ({
+                        ...prev,
+                        priceRange: [priceRange.min, priceRange.max],
+                      })),
+                  )}
 
-                    {(filters.nutritionRange?.protein?.[0] > 0 ||
-                      filters.nutritionRange?.protein?.[1] < 5) &&
-                      renderActiveBadge(
-                        "pro",
-                        `Protein: ${filters.nutritionRange.protein[0]}g - ${filters.nutritionRange.protein[1]}g`,
-                        () =>
-                          updateFilters((prev) => ({
-                            ...prev,
-                            nutritionRange: {
-                              ...prev.nutritionRange,
-                              protein: [0, 5],
-                            },
-                          })),
-                      )}
+                {(filters.weightRange?.[0] > weightRange.min ||
+                  filters.weightRange?.[1] < weightRange.max) &&
+                  renderActiveBadge(
+                    "weight",
+                    `Trọng lượng: ${filters.weightRange[0]} - ${filters.weightRange[1]}`,
+                    () =>
+                      updateFilters((prev) => ({
+                        ...prev,
+                        weightRange: [weightRange.min, weightRange.max],
+                      })),
+                  )}
 
-                    {(filters.nutritionRange?.carbs?.[0] > 0 ||
-                      filters.nutritionRange?.carbs?.[1] < 40) &&
-                      renderActiveBadge(
-                        "carbs",
-                        `Carbs: ${filters.nutritionRange.carbs[0]}g - ${filters.nutritionRange.carbs[1]}g`,
-                        () =>
-                          updateFilters((prev) => ({
-                            ...prev,
-                            nutritionRange: {
-                              ...prev.nutritionRange,
-                              carbs: [0, 40],
-                            },
-                          })),
-                      )}
+                {(filters.nutritionRange?.calories?.[0] > 0 ||
+                  filters.nutritionRange?.calories?.[1] < 200) &&
+                  renderActiveBadge(
+                    "cal",
+                    `Calories: ${filters.nutritionRange.calories[0]}kcal - ${filters.nutritionRange.calories[1]}kcal`,
+                    () =>
+                      updateFilters((prev) => ({
+                        ...prev,
+                        nutritionRange: {
+                          ...prev.nutritionRange,
+                          calories: [0, 200],
+                        },
+                      })),
+                  )}
 
-                    {filters.hasPromotion &&
-                      renderActiveBadge("promo", "Có khuyến mãi", () =>
-                        updateFilters((prev) => ({
-                          ...prev,
-                          hasPromotion: false,
-                        })),
-                      )}
+                {(filters.nutritionRange?.protein?.[0] > 0 ||
+                  filters.nutritionRange?.protein?.[1] < 5) &&
+                  renderActiveBadge(
+                    "pro",
+                    `Protein: ${filters.nutritionRange.protein[0]}g - ${filters.nutritionRange.protein[1]}g`,
+                    () =>
+                      updateFilters((prev) => ({
+                        ...prev,
+                        nutritionRange: {
+                          ...prev.nutritionRange,
+                          protein: [0, 5],
+                        },
+                      })),
+                  )}
 
-                    {filters.inStock &&
-                      renderActiveBadge("stock", "Còn hàng", () =>
-                        updateFilters((prev) => ({
-                          ...prev,
-                          inStock: false,
-                        })),
-                      )}
-                  </AnimatePresence>
+                {(filters.nutritionRange?.carbs?.[0] > 0 ||
+                  filters.nutritionRange?.carbs?.[1] < 40) &&
+                  renderActiveBadge(
+                    "carbs",
+                    `Carbs: ${filters.nutritionRange.carbs[0]}g - ${filters.nutritionRange.carbs[1]}g`,
+                    () =>
+                      updateFilters((prev) => ({
+                        ...prev,
+                        nutritionRange: {
+                          ...prev.nutritionRange,
+                          carbs: [0, 40],
+                        },
+                      })),
+                  )}
 
-                  <motion.div layout>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={resetFilters}
-                      className="text-slate-500 hover:text-red-500 hover:bg-red-50 transition-all duration-200 text-xs h-7 rounded-full"
-                    >
-                      <X className="h-3 w-3 mr-1" />
-                      Xóa tất cả
-                    </Button>
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                {filters.hasPromotion &&
+                  renderActiveBadge("promo", "Có khuyến mãi", () =>
+                    updateFilters((prev) => ({
+                      ...prev,
+                      hasPromotion: false,
+                    })),
+                  )}
 
-            {/* ─── Product Grid ─────────────────────────────────────── */}
-            {filteredProducts.length === 0 ? (
-              <motion.div
-                className="flex flex-col items-center justify-center py-20 px-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-              >
-                <motion.div
-                  className="h-20 w-20 rounded-2xl bg-gradient-to-br from-amber-100 to-yellow-50 flex items-center justify-center mb-5 shadow-lg"
-                  animate={{
-                    scale: [1, 1.05, 1],
-                    rotate: [0, 5, -5, 0],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                >
-                  <Search className="h-9 w-9 text-amber-500" />
-                </motion.div>
-                <h3 className="text-lg font-semibold text-stone-800 mb-2">
-                  Không tìm thấy sản phẩm phù hợp
-                </h3>
-                <p className="text-sm text-slate-500 text-center max-w-md mb-6 leading-relaxed">
-                  Không tìm thấy sản phẩm nào phù hợp với bộ lọc của bạn. Hãy
-                  thử điều chỉnh lại bộ lọc.
-                </p>
+                {filters.inStock &&
+                  renderActiveBadge("stock", "Còn hàng", () =>
+                    updateFilters((prev) => ({
+                      ...prev,
+                      inStock: false,
+                    })),
+                  )}
+              </AnimatePresence>
+
+              <motion.div layout>
                 <Button
-                  variant="outline"
+                  variant="ghost"
+                  size="sm"
                   onClick={resetFilters}
-                  className="rounded-xl hover:bg-gradient-to-r hover:from-amber-50 hover:to-yellow-50 hover:border-amber-300 transition-all duration-200 h-10 shadow-sm"
+                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200 text-xs h-7 rounded-full"
                 >
-                  Xóa tất cả bộ lọc
+                  <X className="h-3 w-3 mr-1" />
+                  Xóa tất cả
                 </Button>
               </motion.div>
-            ) : tab === "tab-1" ? (
-              <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 px-3 sm:px-5 pb-6 gap-4 sm:gap-5">
-                <AnimatePresence mode="popLayout">
-                  {filteredProducts.map((product, productIdx) =>
-                    product.variant.map((variantItem, variantIdx) => (
-                      <motion.div
-                        key={variantItem.productVariantId}
-                        {...getAnimProps(
-                          productIdx * product.variant.length + variantIdx,
-                        )}
-                        layout
-                      >
-                        <CardProduct
-                          categories={product.categories}
-                          description={product.description}
-                          productId={product.id}
-                          name={product.name}
-                          mainImageUrl={
-                            variantItem?.imageVariant || product.mainImageUrl
-                          }
-                          quantitySold={product.quantitySold}
-                          rating={product.rating}
-                          variant={variantItem}
-                          type="single"
-                          disabled={variantItem.stockQuantity < 1}
-                        />
-                      </motion.div>
-                    )),
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : tab === "tab-2" ? (
-              combos.length ? (
-                <div className="w-full grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 sm:gap-5 px-3 sm:px-5 pb-6">
-                  {combos.map((combo, i) => (
-                    <motion.div key={combo.id} {...getAnimProps(i)} layout>
-                      <ComboProductCard product={{ ...combo, type: "combo" }} />
-                    </motion.div>
-                  ))}
-                </div>
-              ) : (
-                <EmptyState
-                  icons={[StickyNote]}
-                  title="Chưa có Combo sản phẩm nào!"
-                  description="Có vẻ như chưa có Combo sản phẩm nào hãy tải lại trang"
-                  className="min-w-full flex flex-col"
-                  action={{
-                    label: "Tải lại",
-                    onClick: () => comboRefetch(),
-                  }}
-                />
-              )
-            ) : (
-              tab === "tab-3" && (
-                <div className="px-3 sm:px-5 pb-6">
-                  <CustomComboBuilder productsData={filteredProducts} />
-                </div>
-              )
-            )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ─── Product Grid ─────────────────────────────────────── */}
+        {filteredProducts.length === 0 ? (
+          <motion.div
+            className="flex flex-col items-center justify-center py-20 px-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+          >
+            <motion.div
+              className="h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-5 shadow-lg"
+              animate={{
+                scale: [1, 1.05, 1],
+                rotate: [0, 5, -5, 0],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              <Search className="h-9 w-9 text-primary" />
+            </motion.div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              Không tìm thấy sản phẩm phù hợp
+            </h3>
+            <p className="text-sm text-muted-foreground text-center max-w-md mb-6 leading-relaxed">
+              Không tìm thấy sản phẩm nào phù hợp với bộ lọc của bạn. Hãy thử
+              điều chỉnh lại bộ lọc.
+            </p>
+            <Button
+              variant="outline"
+              onClick={resetFilters}
+              className="rounded-xl hover:bg-primary/5 hover:border-primary/40 transition-all duration-200 h-10 shadow-sm"
+            >
+              Xóa tất cả bộ lọc
+            </Button>
+          </motion.div>
+        ) : tab === "tab-1" ? (
+          <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5">
+            <AnimatePresence mode="popLayout">
+              {filteredProducts.map((product, productIdx) =>
+                product.variant.map((variantItem, variantIdx) => (
+                  <motion.div
+                    key={variantItem.productVariantId}
+                    {...getAnimProps(
+                      productIdx * product.variant.length + variantIdx,
+                    )}
+                    layout
+                  >
+                    <CardProduct
+                      categories={product.categories}
+                      description={product.description}
+                      productId={product.id}
+                      name={product.name}
+                      mainImageUrl={
+                        variantItem?.imageVariant || product.mainImageUrl
+                      }
+                      quantitySold={product.quantitySold}
+                      rating={product.rating}
+                      variant={variantItem}
+                      type="single"
+                      disabled={variantItem.stockQuantity < 1}
+                    />
+                  </motion.div>
+                )),
+              )}
+            </AnimatePresence>
           </div>
-        </SidebarInset>
-      </SidebarProvider>
+        ) : tab === "tab-2" ? (
+          combos.length ? (
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+              {combos.map((combo, i) => (
+                <motion.div key={combo.id} {...getAnimProps(i)} layout>
+                  <ComboProductCard product={{ ...combo, type: "combo" }} />
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              icons={[StickyNote]}
+              title="Chưa có Combo sản phẩm nào!"
+              description="Có vẻ như chưa có Combo sản phẩm nào hãy tải lại trang"
+              className="min-w-full flex flex-col"
+              action={{
+                label: "Tải lại",
+                onClick: () => comboRefetch(),
+              }}
+            />
+          )
+        ) : (
+          tab === "tab-3" && (
+            <div>
+              <CustomComboBuilder productsData={filteredProducts} />
+            </div>
+          )
+        )}
+      </div>
     );
   },
 );

@@ -15,12 +15,12 @@ This file contains the original hex color values from the Mira design system tha
 
 | Variable    | Hex Value | HSL Value        | Applied |
 | ----------- | --------- | ---------------- | ------- |
-| Background  | `#FFFAF3` | `40 100% 97.5%`  | ✅      |
-| Foreground  | `#000000` | `0 0% 0%`        | ✅      |
+| Background  | `#FAFAFA` | `0 0% 98%`       | ✅      |
+| Foreground  | `#0D0D0D` | `0 0% 5%`        | ✅      |
 | Primary     | `#7033ff` | `262 100% 59.4%` | ✅      |
-| Secondary   | `#edf0f4` | `216 25% 94.3%`  | ✅      |
+| Secondary   | `#F2F3F5` | `220 14% 96%`    | ✅      |
 | Destructive | `#e54b4f` | `357 75% 60.4%`  | ✅      |
-| Border      | `#e7e7ee` | `249 13% 92.4%`  | ✅      |
+| Border      | `#E3E4E6` | `220 13% 91%`    | ✅      |
 
 ### Chart Colors (Light)
 
@@ -34,13 +34,13 @@ This file contains the original hex color values from the Mira design system tha
 
 ## Dark Mode Colors (Original Hex → Applied HSL)
 
-| Variable    | Hex Value | HSL Value        | Applied |
-| ----------- | --------- | ---------------- | ------- |
-| Background  | `#1a1b1e` | `225 7.7% 10.6%` | ✅      |
-| Foreground  | `#f0f0f0` | `0 0% 94.1%`     | ✅      |
-| Primary     | `#8c5cff` | `262 100% 68%`   | ✅      |
-| Destructive | `#f87171` | `0 70% 70.6%`    | ✅      |
-| Border      | `#33353a` | `220 6.5% 21.2%` | ✅      |
+| Variable    | Hex Value | HSL Value      | Applied |
+| ----------- | --------- | -------------- | ------- |
+| Background  | `#0A0A0B` | `240 10% 4%`   | ✅      |
+| Foreground  | `#FAFAFA` | `0 0% 98%`     | ✅      |
+| Primary     | `#8c5cff` | `262 100% 68%` | ✅      |
+| Destructive | `#f87171` | `0 70% 70.6%`  | ✅      |
+| Border      | `#2A2B2E` | `240 6% 18%`   | ✅      |
 
 ### Chart Colors (Dark)
 
@@ -77,25 +77,27 @@ This file contains the original hex color values from the Mira design system tha
 
 ### Background Color Analysis
 
-**#FFFAF3 (Warm Cream)**
+**#FAFAFA (Soft Neutral Gray)**
 
-- **Hue**: 40° (warm orange undertone)
-- **Saturation**: 100% (vibrant but subtle)
-- **Lightness**: 97.5% (very bright, comfortable)
+- **Hue**: 0° (neutral, no color bias)
+- **Saturation**: 0% (pure neutral)
+- **Lightness**: 98% (very bright, comfortable)
 
 This color was specifically chosen because:
 
-1. ✅ **Food-Safe**: Warm neutrals increase appetite
-2. ✅ **Natural**: Evokes organic, artisanal products
-3. ✅ **Premium**: Sophisticated alternative to pure white
-4. ✅ **Fruit-Friendly**: Complements colorful fruit imagery
-5. ✅ **Eye-Comfort**: Reduces screen fatigue vs pure white
+1. ✅ **Modern & Clean**: Contemporary neutral that feels premium
+2. ✅ **Better Contrast**: Pure white cards pop against the subtle gray background
+3. ✅ **Eye Comfort**: Reduces eye strain compared to pure white or warm tints
+4. ✅ **Fruit-Friendly**: Neutral base lets colorful fruit imagery shine
+5. ✅ **Professional**: Conveys quality and trustworthiness
+6. ✅ **Versatile**: Works perfectly with both vibrant and muted content
 
 ### Color Psychology
 
-- **Orange/Amber tones**: Energy, vitality, natural goodness
-- **Cream base**: Premium, organic, artisanal
-- **Purple accents**: Luxury, uniqueness, quality
+- **Neutral gray tones**: Clean, modern, professional, trustworthy
+- **High contrast**: Clear visual hierarchy, easy to scan
+- **Purple accents**: Luxury, uniqueness, premium quality
+- **Vibrant fruit colors**: Energy, freshness, natural goodness
 
 ---
 
