@@ -569,8 +569,8 @@ export default function ComboProductCard({ product }: ComboProductCardProps) {
                           {formatPrice(
                             product.variant.reduce(
                               (sum, item) => sum + item.price * item.quantity,
-                              0
-                            )
+                              0,
+                            ),
                           )}
                         </span>
                         <span className="text-sm font-medium text-primary">
