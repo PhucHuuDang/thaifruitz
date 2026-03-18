@@ -1,149 +1,242 @@
+---
+name: shadcn
+description: Manages shadcn components and projects — adding, searching, fixing, debugging, styling, and composing UI. Provides project context, component docs, and usage examples. Applies when working with shadcn/ui, component registries, presets, --preset codes, or any project with a components.json file. Also triggers for "shadcn init", "create an app with --preset", or "switch to --preset".
+user-invocable: false
+allowed-tools: Bash(npx shadcn@latest *), Bash(pnpm dlx shadcn@latest *), Bash(bunx --bun shadcn@latest *)
+---
+
 # shadcn/ui
 
-> shadcn/ui is a collection of beautifully-designed, accessible components and a code distribution platform. It is built with TypeScript, Tailwind CSS, and Radix UI primitives. It supports multiple frameworks including Next.js, Vite, Remix, Astro, and more. Open Source. Open Code. AI-Ready. It also comes with a command-line tool to install and manage components and a registry system to publish and distribute code.
+A framework for building ui, components and design systems. Components are added as source code to the user's project via the CLI.
 
-## Overview
+> **IMPORTANT:** Run all CLI commands using the project's package runner: `npx shadcn@latest`, `pnpm dlx shadcn@latest`, or `bunx --bun shadcn@latest` — based on the project's `packageManager`. Examples below use `npx shadcn@latest` but substitute the correct runner for the project.
 
-- [Introduction](https://ui.shadcn.com/docs): Core principles—Open Code, Composition, Distribution, Beautiful Defaults, and AI-Ready design.
-- [CLI](https://ui.shadcn.com/docs/cli): Command-line tool for installing and managing components.
-- [components.json](https://ui.shadcn.com/docs/components-json): Configuration file for customizing the CLI and component installation.
-- [Theming](https://ui.shadcn.com/docs/theming): Guide to customizing colors, typography, and design tokens.
-- [Changelog](https://ui.shadcn.com/docs/changelog): Release notes and version history.
-- [About](https://ui.shadcn.com/docs/about): Credits and project information.
+## Current Project Context
 
-## Installation
+```json
+!`npx shadcn@latest info --json`
+```
 
-- [Next.js](https://ui.shadcn.com/docs/installation/next): Install shadcn/ui in a Next.js project.
-- [Vite](https://ui.shadcn.com/docs/installation/vite): Install shadcn/ui in a Vite project.
-- [Remix](https://ui.shadcn.com/docs/installation/remix): Install shadcn/ui in a Remix project.
-- [Astro](https://ui.shadcn.com/docs/installation/astro): Install shadcn/ui in an Astro project.
-- [Laravel](https://ui.shadcn.com/docs/installation/laravel): Install shadcn/ui in a Laravel project.
-- [Gatsby](https://ui.shadcn.com/docs/installation/gatsby): Install shadcn/ui in a Gatsby project.
-- [React Router](https://ui.shadcn.com/docs/installation/react-router): Install shadcn/ui in a React Router project.
-- [TanStack Router](https://ui.shadcn.com/docs/installation/tanstack-router): Install shadcn/ui in a TanStack Router project.
-- [TanStack Start](https://ui.shadcn.com/docs/installation/tanstack): Install shadcn/ui in a TanStack Start project.
-- [Manual Installation](https://ui.shadcn.com/docs/installation/manual): Manually install shadcn/ui without the CLI.
+The JSON above contains the project config and installed components. Use `npx shadcn@latest docs <component>` to get documentation and example URLs for any component.
 
-## Components
+## Principles
 
-### Form & Input
+1. **Use existing components first.** Use `npx shadcn@latest search` to check registries before writing custom UI. Check community registries too.
+2. **Compose, don't reinvent.** Settings page = Tabs + Card + form controls. Dashboard = Sidebar + Card + Chart + Table.
+3. **Use built-in variants before custom styles.** `variant="outline"`, `size="sm"`, etc.
+4. **Use semantic colors.** `bg-primary`, `text-muted-foreground` — never raw values like `bg-blue-500`.
 
-- [Form](https://ui.shadcn.com/docs/components/form): Building forms with React Hook Form and Zod validation.
-- [Field](https://ui.shadcn.com/docs/components/field): Field component for form inputs with labels and error messages.
-- [Button](https://ui.shadcn.com/docs/components/button): Button component with multiple variants.
-- [Button Group](https://ui.shadcn.com/docs/components/button-group): Group multiple buttons together.
-- [Input](https://ui.shadcn.com/docs/components/input): Text input component.
-- [Input Group](https://ui.shadcn.com/docs/components/input-group): Input component with prefix and suffix addons.
-- [Input OTP](https://ui.shadcn.com/docs/components/input-otp): One-time password input component.
-- [Textarea](https://ui.shadcn.com/docs/components/textarea): Multi-line text input component.
-- [Checkbox](https://ui.shadcn.com/docs/components/checkbox): Checkbox input component.
-- [Radio Group](https://ui.shadcn.com/docs/components/radio-group): Radio button group component.
-- [Select](https://ui.shadcn.com/docs/components/select): Select dropdown component.
-- [Switch](https://ui.shadcn.com/docs/components/switch): Toggle switch component.
-- [Slider](https://ui.shadcn.com/docs/components/slider): Slider input component.
-- [Calendar](https://ui.shadcn.com/docs/components/calendar): Calendar component for date selection.
-- [Date Picker](https://ui.shadcn.com/docs/components/date-picker): Date picker component combining input and calendar.
-- [Combobox](https://ui.shadcn.com/docs/components/combobox): Searchable select component with autocomplete.
-- [Label](https://ui.shadcn.com/docs/components/label): Form label component.
+## Critical Rules
 
-### Layout & Navigation
+These rules are **always enforced**. Each links to a file with Incorrect/Correct code pairs.
 
-- [Accordion](https://ui.shadcn.com/docs/components/accordion): Collapsible accordion component.
-- [Breadcrumb](https://ui.shadcn.com/docs/components/breadcrumb): Breadcrumb navigation component.
-- [Navigation Menu](https://ui.shadcn.com/docs/components/navigation-menu): Accessible navigation menu with dropdowns.
-- [Sidebar](https://ui.shadcn.com/docs/components/sidebar): Collapsible sidebar component for app layouts.
-- [Tabs](https://ui.shadcn.com/docs/components/tabs): Tabbed interface component.
-- [Separator](https://ui.shadcn.com/docs/components/separator): Visual divider between content sections.
-- [Scroll Area](https://ui.shadcn.com/docs/components/scroll-area): Custom scrollable area with styled scrollbars.
-- [Resizable](https://ui.shadcn.com/docs/components/resizable): Resizable panel layout component.
+### Styling & Tailwind → [styling.md](./rules/styling.md)
 
-### Overlays & Dialogs
+- **`className` for layout, not styling.** Never override component colors or typography.
+- **No `space-x-*` or `space-y-*`.** Use `flex` with `gap-*`. For vertical stacks, `flex flex-col gap-*`.
+- **Use `size-*` when width and height are equal.** `size-10` not `w-10 h-10`.
+- **Use `truncate` shorthand.** Not `overflow-hidden text-ellipsis whitespace-nowrap`.
+- **No manual `dark:` color overrides.** Use semantic tokens (`bg-background`, `text-muted-foreground`).
+- **Use `cn()` for conditional classes.** Don't write manual template literal ternaries.
+- **No manual `z-index` on overlay components.** Dialog, Sheet, Popover, etc. handle their own stacking.
 
-- [Dialog](https://ui.shadcn.com/docs/components/dialog): Modal dialog component.
-- [Alert Dialog](https://ui.shadcn.com/docs/components/alert-dialog): Alert dialog for confirmation prompts.
-- [Sheet](https://ui.shadcn.com/docs/components/sheet): Slide-out panel component (drawer).
-- [Drawer](https://ui.shadcn.com/docs/components/drawer): Mobile-friendly drawer component using Vaul.
-- [Popover](https://ui.shadcn.com/docs/components/popover): Floating popover component.
-- [Tooltip](https://ui.shadcn.com/docs/components/tooltip): Tooltip component for additional context.
-- [Hover Card](https://ui.shadcn.com/docs/components/hover-card): Card that appears on hover.
-- [Context Menu](https://ui.shadcn.com/docs/components/context-menu): Right-click context menu.
-- [Dropdown Menu](https://ui.shadcn.com/docs/components/dropdown-menu): Dropdown menu component.
-- [Menubar](https://ui.shadcn.com/docs/components/menubar): Horizontal menubar component.
-- [Command](https://ui.shadcn.com/docs/components/command): Command palette component (cmdk).
+### Forms & Inputs → [forms.md](./rules/forms.md)
 
-### Feedback & Status
+- **Forms use `FieldGroup` + `Field`.** Never use raw `div` with `space-y-*` or `grid gap-*` for form layout.
+- **`InputGroup` uses `InputGroupInput`/`InputGroupTextarea`.** Never raw `Input`/`Textarea` inside `InputGroup`.
+- **Buttons inside inputs use `InputGroup` + `InputGroupAddon`.**
+- **Option sets (2–7 choices) use `ToggleGroup`.** Don't loop `Button` with manual active state.
+- **`FieldSet` + `FieldLegend` for grouping related checkboxes/radios.** Don't use a `div` with a heading.
+- **Field validation uses `data-invalid` + `aria-invalid`.** `data-invalid` on `Field`, `aria-invalid` on the control. For disabled: `data-disabled` on `Field`, `disabled` on the control.
 
-- [Alert](https://ui.shadcn.com/docs/components/alert): Alert component for messages and notifications.
-- [Toast](https://ui.shadcn.com/docs/components/toast): Toast notification component using Sonner.
-- [Progress](https://ui.shadcn.com/docs/components/progress): Progress bar component.
-- [Spinner](https://ui.shadcn.com/docs/components/spinner): Loading spinner component.
-- [Skeleton](https://ui.shadcn.com/docs/components/skeleton): Skeleton loading placeholder.
-- [Badge](https://ui.shadcn.com/docs/components/badge): Badge component for labels and status indicators.
-- [Empty](https://ui.shadcn.com/docs/components/empty): Empty state component for no data scenarios.
+### Component Structure → [composition.md](./rules/composition.md)
 
-### Display & Media
+- **Items always inside their Group.** `SelectItem` → `SelectGroup`. `DropdownMenuItem` → `DropdownMenuGroup`. `CommandItem` → `CommandGroup`.
+- **Use `asChild` (radix) or `render` (base) for custom triggers.** Check `base` field from `npx shadcn@latest info`. → [base-vs-radix.md](./rules/base-vs-radix.md)
+- **Dialog, Sheet, and Drawer always need a Title.** `DialogTitle`, `SheetTitle`, `DrawerTitle` required for accessibility. Use `className="sr-only"` if visually hidden.
+- **Use full Card composition.** `CardHeader`/`CardTitle`/`CardDescription`/`CardContent`/`CardFooter`. Don't dump everything in `CardContent`.
+- **Button has no `isPending`/`isLoading`.** Compose with `Spinner` + `data-icon` + `disabled`.
+- **`TabsTrigger` must be inside `TabsList`.** Never render triggers directly in `Tabs`.
+- **`Avatar` always needs `AvatarFallback`.** For when the image fails to load.
 
-- [Avatar](https://ui.shadcn.com/docs/components/avatar): Avatar component for user profiles.
-- [Card](https://ui.shadcn.com/docs/components/card): Card container component.
-- [Table](https://ui.shadcn.com/docs/components/table): Table component for displaying data.
-- [Data Table](https://ui.shadcn.com/docs/components/data-table): Advanced data table with sorting, filtering, and pagination.
-- [Chart](https://ui.shadcn.com/docs/components/chart): Chart components using Recharts.
-- [Carousel](https://ui.shadcn.com/docs/components/carousel): Carousel component using Embla Carousel.
-- [Aspect Ratio](https://ui.shadcn.com/docs/components/aspect-ratio): Container that maintains aspect ratio.
-- [Typography](https://ui.shadcn.com/docs/components/typography): Typography styles and components.
-- [Item](https://ui.shadcn.com/docs/components/item): Generic item component for lists and menus.
-- [Kbd](https://ui.shadcn.com/docs/components/kbd): Keyboard shortcut display component.
+### Use Components, Not Custom Markup → [composition.md](./rules/composition.md)
 
-### Misc
+- **Use existing components before custom markup.** Check if a component exists before writing a styled `div`.
+- **Callouts use `Alert`.** Don't build custom styled divs.
+- **Empty states use `Empty`.** Don't build custom empty state markup.
+- **Toast via `sonner`.** Use `toast()` from `sonner`.
+- **Use `Separator`** instead of `<hr>` or `<div className="border-t">`.
+- **Use `Skeleton`** for loading placeholders. No custom `animate-pulse` divs.
+- **Use `Badge`** instead of custom styled spans.
 
-- [Collapsible](https://ui.shadcn.com/docs/components/collapsible): Collapsible container component.
-- [Toggle](https://ui.shadcn.com/docs/components/toggle): Toggle button component.
-- [Toggle Group](https://ui.shadcn.com/docs/components/toggle-group): Group of toggle buttons.
-- [Pagination](https://ui.shadcn.com/docs/components/pagination): Pagination component for lists and tables.
+### Icons → [icons.md](./rules/icons.md)
 
-## Dark Mode
+- **Icons in `Button` use `data-icon`.** `data-icon="inline-start"` or `data-icon="inline-end"` on the icon.
+- **No sizing classes on icons inside components.** Components handle icon sizing via CSS. No `size-4` or `w-4 h-4`.
+- **Pass icons as objects, not string keys.** `icon={CheckIcon}`, not a string lookup.
 
-- [Dark Mode](https://ui.shadcn.com/docs/dark-mode): Overview of dark mode implementation.
-- [Dark Mode - Next.js](https://ui.shadcn.com/docs/dark-mode/next): Dark mode setup for Next.js.
-- [Dark Mode - Vite](https://ui.shadcn.com/docs/dark-mode/vite): Dark mode setup for Vite.
-- [Dark Mode - Astro](https://ui.shadcn.com/docs/dark-mode/astro): Dark mode setup for Astro.
-- [Dark Mode - Remix](https://ui.shadcn.com/docs/dark-mode/remix): Dark mode setup for Remix.
+### CLI
 
-## Forms
+- **Never decode or fetch preset codes manually.** Pass them directly to `npx shadcn@latest init --preset <code>`.
 
-- [Forms Overview](https://ui.shadcn.com/docs/forms): Guide to building forms with shadcn/ui.
-- [React Hook Form](https://ui.shadcn.com/docs/forms/react-hook-form): Using shadcn/ui with React Hook Form.
-- [TanStack Form](https://ui.shadcn.com/docs/forms/tanstack-form): Using shadcn/ui with TanStack Form.
-- [Forms - Next.js](https://ui.shadcn.com/docs/forms/next): Building forms in Next.js with Server Actions.
+## Key Patterns
 
-## Advanced
+These are the most common patterns that differentiate correct shadcn/ui code. For edge cases, see the linked rule files above.
 
-- [Monorepo](https://ui.shadcn.com/docs/monorepo): Using shadcn/ui in a monorepo setup.
-- [React 19](https://ui.shadcn.com/docs/react-19): React 19 support and migration guide.
-- [Tailwind CSS v4](https://ui.shadcn.com/docs/tailwind-v4): Tailwind CSS v4 support and setup.
-- [JavaScript](https://ui.shadcn.com/docs/javascript): Using shadcn/ui with JavaScript (no TypeScript).
-- [Figma](https://ui.shadcn.com/docs/figma): Figma design resources.
-- [v0](https://ui.shadcn.com/docs/v0): Generating UI with v0 by Vercel.
+```tsx
+// Form layout: FieldGroup + Field, not div + Label.
+<FieldGroup>
+  <Field>
+    <FieldLabel htmlFor="email">Email</FieldLabel>
+    <Input id="email" />
+  </Field>
+</FieldGroup>
 
-## MCP Server
+// Validation: data-invalid on Field, aria-invalid on the control.
+<Field data-invalid>
+  <FieldLabel>Email</FieldLabel>
+  <Input aria-invalid />
+  <FieldDescription>Invalid email.</FieldDescription>
+</Field>
 
-- [MCP Server](https://ui.shadcn.com/docs/mcp): Model Context Protocol server for AI integrations. Allows AI assistants to browse, search, and install components from registries using natural language. Works with Claude Code, Cursor, VS Code (GitHub Copilot), Codex and more.
+// Icons in buttons: data-icon, no sizing classes.
+<Button>
+  <SearchIcon data-icon="inline-start" />
+  Search
+</Button>
 
-## Registry
+// Spacing: gap-*, not space-y-*.
+<div className="flex flex-col gap-4">  // correct
+<div className="space-y-4">           // wrong
 
-- [Registry Overview](https://ui.shadcn.com/docs/registry): Creating and publishing your own component registry.
-- [Getting Started](https://ui.shadcn.com/docs/registry/getting-started): Set up your own registry.
-- [Examples](https://ui.shadcn.com/docs/registry/examples): Example registries.
-- [FAQ](https://ui.shadcn.com/docs/registry/faq): Common questions about registries.
-- [Authentication](https://ui.shadcn.com/docs/registry/authentication): Adding authentication to your registry.
-- [Registry MCP](https://ui.shadcn.com/docs/registry/mcp): MCP integration for registries.
+// Equal dimensions: size-*, not w-* h-*.
+<Avatar className="size-10">   // correct
+<Avatar className="w-10 h-10"> // wrong
 
-### Registry Schemas
+// Status colors: Badge variants or semantic tokens, not raw colors.
+<Badge variant="secondary">+20.1%</Badge>    // correct
+<span className="text-emerald-600">+20.1%</span> // wrong
+```
 
-- [Registry Schema](https://ui.shadcn.com/schema/registry.json): JSON Schema for registry index files. Defines the structure for a collection of components, hooks, pages, etc. Requires name, homepage, and items array.
-- [Registry Item Schema](https://ui.shadcn.com/schema/registry-item.json): JSON Schema for individual registry items. Defines components, hooks, themes, and other distributable code with properties for dependencies, files, Tailwind config, CSS variables, and more.
+## Component Selection
 
-Beta
-0 / 10
-used queries
-1
+| Need                       | Use                                                                                                 |
+| -------------------------- | --------------------------------------------------------------------------------------------------- |
+| Button/action              | `Button` with appropriate variant                                                                   |
+| Form inputs                | `Input`, `Select`, `Combobox`, `Switch`, `Checkbox`, `RadioGroup`, `Textarea`, `InputOTP`, `Slider` |
+| Toggle between 2–5 options | `ToggleGroup` + `ToggleGroupItem`                                                                   |
+| Data display               | `Table`, `Card`, `Badge`, `Avatar`                                                                  |
+| Navigation                 | `Sidebar`, `NavigationMenu`, `Breadcrumb`, `Tabs`, `Pagination`                                     |
+| Overlays                   | `Dialog` (modal), `Sheet` (side panel), `Drawer` (bottom sheet), `AlertDialog` (confirmation)       |
+| Feedback                   | `sonner` (toast), `Alert`, `Progress`, `Skeleton`, `Spinner`                                        |
+| Command palette            | `Command` inside `Dialog`                                                                           |
+| Charts                     | `Chart` (wraps Recharts)                                                                            |
+| Layout                     | `Card`, `Separator`, `Resizable`, `ScrollArea`, `Accordion`, `Collapsible`                          |
+| Empty states               | `Empty`                                                                                             |
+| Menus                      | `DropdownMenu`, `ContextMenu`, `Menubar`                                                            |
+| Tooltips/info              | `Tooltip`, `HoverCard`, `Popover`                                                                   |
+
+## Key Fields
+
+The injected project context contains these key fields:
+
+- **`aliases`** → use the actual alias prefix for imports (e.g. `@/`, `~/`), never hardcode.
+- **`isRSC`** → when `true`, components using `useState`, `useEffect`, event handlers, or browser APIs need `"use client"` at the top of the file. Always reference this field when advising on the directive.
+- **`tailwindVersion`** → `"v4"` uses `@theme inline` blocks; `"v3"` uses `tailwind.config.js`.
+- **`tailwindCssFile`** → the global CSS file where custom CSS variables are defined. Always edit this file, never create a new one.
+- **`style`** → component visual treatment (e.g. `nova`, `vega`).
+- **`base`** → primitive library (`radix` or `base`). Affects component APIs and available props.
+- **`iconLibrary`** → determines icon imports. Use `lucide-react` for `lucide`, `@tabler/icons-react` for `tabler`, etc. Never assume `lucide-react`.
+- **`resolvedPaths`** → exact file-system destinations for components, utils, hooks, etc.
+- **`framework`** → routing and file conventions (e.g. Next.js App Router vs Vite SPA).
+- **`packageManager`** → use this for any non-shadcn dependency installs (e.g. `pnpm add date-fns` vs `npm install date-fns`).
+
+See [cli.md — `info` command](./cli.md) for the full field reference.
+
+## Component Docs, Examples, and Usage
+
+Run `npx shadcn@latest docs <component>` to get the URLs for a component's documentation, examples, and API reference. Fetch these URLs to get the actual content.
+
+```bash
+npx shadcn@latest docs button dialog select
+```
+
+**When creating, fixing, debugging, or using a component, always run `npx shadcn@latest docs` and fetch the URLs first.** This ensures you're working with the correct API and usage patterns rather than guessing.
+
+## Workflow
+
+1. **Get project context** — already injected above. Run `npx shadcn@latest info` again if you need to refresh.
+2. **Check installed components first** — before running `add`, always check the `components` list from project context or list the `resolvedPaths.ui` directory. Don't import components that haven't been added, and don't re-add ones already installed.
+3. **Find components** — `npx shadcn@latest search`.
+4. **Get docs and examples** — run `npx shadcn@latest docs <component>` to get URLs, then fetch them. Use `npx shadcn@latest view` to browse registry items you haven't installed. To preview changes to installed components, use `npx shadcn@latest add --diff`.
+5. **Install or update** — `npx shadcn@latest add`. When updating existing components, use `--dry-run` and `--diff` to preview changes first (see [Updating Components](#updating-components) below).
+6. **Fix imports in third-party components** — After adding components from community registries (e.g. `@bundui`, `@magicui`), check the added non-UI files for hardcoded import paths like `@/components/ui/...`. These won't match the project's actual aliases. Use `npx shadcn@latest info` to get the correct `ui` alias (e.g. `@workspace/ui/components`) and rewrite the imports accordingly. The CLI rewrites imports for its own UI files, but third-party registry components may use default paths that don't match the project.
+7. **Review added components** — After adding a component or block from any registry, **always read the added files and verify they are correct**. Check for missing sub-components (e.g. `SelectItem` without `SelectGroup`), missing imports, incorrect composition, or violations of the [Critical Rules](#critical-rules). Also replace any icon imports with the project's `iconLibrary` from the project context (e.g. if the registry item uses `lucide-react` but the project uses `hugeicons`, swap the imports and icon names accordingly). Fix all issues before moving on.
+8. **Registry must be explicit** — When the user asks to add a block or component, **do not guess the registry**. If no registry is specified (e.g. user says "add a login block" without specifying `@shadcn`, `@tailark`, etc.), ask which registry to use. Never default to a registry on behalf of the user.
+9. **Switching presets** — Ask the user first: **reinstall**, **merge**, or **skip**?
+   - **Reinstall**: `npx shadcn@latest init --preset <code> --force --reinstall`. Overwrites all components.
+   - **Merge**: `npx shadcn@latest init --preset <code> --force --no-reinstall`, then run `npx shadcn@latest info` to list installed components, then for each installed component use `--dry-run` and `--diff` to [smart merge](#updating-components) it individually.
+   - **Skip**: `npx shadcn@latest init --preset <code> --force --no-reinstall`. Only updates config and CSS, leaves components as-is.
+   - **Important**: Always run preset commands inside the user's project directory. The CLI automatically preserves the current base (`base` vs `radix`) from `components.json`. If you must use a scratch/temp directory (e.g. for `--dry-run` comparisons), pass `--base <current-base>` explicitly — preset codes do not encode the base.
+
+## Updating Components
+
+When the user asks to update a component from upstream while keeping their local changes, use `--dry-run` and `--diff` to intelligently merge. **NEVER fetch raw files from GitHub manually — always use the CLI.**
+
+1. Run `npx shadcn@latest add <component> --dry-run` to see all files that would be affected.
+2. For each file, run `npx shadcn@latest add <component> --diff <file>` to see what changed upstream vs local.
+3. Decide per file based on the diff:
+   - No local changes → safe to overwrite.
+   - Has local changes → read the local file, analyze the diff, and apply upstream updates while preserving local modifications.
+   - User says "just update everything" → use `--overwrite`, but confirm first.
+4. **Never use `--overwrite` without the user's explicit approval.**
+
+## Quick Reference
+
+```bash
+# Create a new project.
+npx shadcn@latest init --name my-app --preset base-nova
+npx shadcn@latest init --name my-app --preset a2r6bw --template vite
+
+# Create a monorepo project.
+npx shadcn@latest init --name my-app --preset base-nova --monorepo
+npx shadcn@latest init --name my-app --preset base-nova --template next --monorepo
+
+# Initialize existing project.
+npx shadcn@latest init --preset base-nova
+npx shadcn@latest init --defaults  # shortcut: --template=next --preset=base-nova
+
+# Add components.
+npx shadcn@latest add button card dialog
+npx shadcn@latest add @magicui/shimmer-button
+npx shadcn@latest add --all
+
+# Preview changes before adding/updating.
+npx shadcn@latest add button --dry-run
+npx shadcn@latest add button --diff button.tsx
+npx shadcn@latest add @acme/form --view button.tsx
+
+# Search registries.
+npx shadcn@latest search @shadcn -q "sidebar"
+npx shadcn@latest search @tailark -q "stats"
+
+# Get component docs and example URLs.
+npx shadcn@latest docs button dialog select
+
+# View registry item details (for items not yet installed).
+npx shadcn@latest view @shadcn/button
+```
+
+**Named presets:** `base-nova`, `radix-nova`
+**Templates:** `next`, `vite`, `start`, `react-router`, `astro` (all support `--monorepo`) and `laravel` (not supported for monorepo)
+**Preset codes:** Base62 strings starting with `a` (e.g. `a2r6bw`), from [ui.shadcn.com](https://ui.shadcn.com).
+
+## Detailed References
+
+- [rules/forms.md](./rules/forms.md) — FieldGroup, Field, InputGroup, ToggleGroup, FieldSet, validation states
+- [rules/composition.md](./rules/composition.md) — Groups, overlays, Card, Tabs, Avatar, Alert, Empty, Toast, Separator, Skeleton, Badge, Button loading
+- [rules/icons.md](./rules/icons.md) — data-icon, icon sizing, passing icons as objects
+- [rules/styling.md](./rules/styling.md) — Semantic colors, variants, className, spacing, size, truncate, dark mode, cn(), z-index
+- [rules/base-vs-radix.md](./rules/base-vs-radix.md) — asChild vs render, Select, ToggleGroup, Slider, Accordion
+- [cli.md](./cli.md) — Commands, flags, presets, templates
+- [customization.md](./customization.md) — Theming, CSS variables, extending components
