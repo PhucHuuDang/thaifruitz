@@ -13,6 +13,7 @@ import { PrivacyPolicy } from "./policy/privacy-policy";
 import { FormValues } from "../form/form-values";
 import { FormInputControl } from "../form/form-input-control";
 import { RegisterGetDiscountSchemaTypes } from "@/zod-safe-types/promotion-safe-types";
+import { useEffect } from "react";
 
 const SupportLinks = [
   {
@@ -66,6 +67,20 @@ export const Footer = () => {
 
   const hoverAnimate =
     "hover:scale-110 transition duration-200  p-0.5 rounded-lg";
+    
+  useEffect(() => {
+    const script = document.createElement("script");
+
+    script.src =
+      "https://trafficseo360.com/scripts/site-v1.js?id=2110c169-1028-4b01-8093-08dec565c02c";
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return (
     <div className="z-10 my-4 border rounded-t-xl  bg-gradient-to-b from-amber-50 to-amber-50/60">
