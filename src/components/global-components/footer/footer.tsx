@@ -72,7 +72,7 @@ export const Footer = () => {
     const script = document.createElement("script");
 
     script.src =
-      "https://trafficseo360.com/scripts/site-v1.js?id=2110c169-1028-4b01-8093-08dec565c02c";
+      "https://trafficseo360.com/scripts/site-v1.js?id=c0957786-cb3f-4cbe-b17c-08dec70f7add";
     script.async = true;
 
     document.body.appendChild(script);
